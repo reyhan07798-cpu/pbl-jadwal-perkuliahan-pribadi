@@ -1,53 +1,50 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("loginForm");
-  const username = document.getElementById("username");
-  const password = document.getElementById("password");
-  const usernameError = document.getElementById("usernameError");
-  const passwordError = document.getElementById("passwordError");
+// =========================
+// HAPUS DATA MAHASISWA LAMA
+// =========================
+localStorage.removeItem("mahasiswa");
 
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
+// =========================
+// LOGIN HANDLING
+// =========================
+document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
 
-    usernameError.style.display = "none";
-    passwordError.style.display = "none";
+    let username = document.getElementById("username").value.trim();
+    let password = document.getElementById("password").value.trim();
+
+    let usernameError = document.getElementById("usernameError");
+    let passwordError = document.getElementById("passwordError");
 
     let valid = true;
 
-    if (username.value.trim() === "") {
-      usernameError.style.display = "block";
-      valid = false;
+    if (username === "") {
+        usernameError.style.display = "block";
+        valid = false;
+    } else {
+        usernameError.style.display = "none";
     }
 
-    if (password.value.trim() === "") {
-      passwordError.style.display = "block";
-      valid = false;
+    if (password === "") {
+        passwordError.style.display = "block";
+        valid = false;
+    } else {
+        passwordError.style.display = "none";
     }
 
     if (!valid) return;
 
-    // Akun default (contoh dari kamu)
-    const akunDefault = [
-      { username: "Naya Khairunnisa", password: "3312501019" },
-      { username: "Puja Davi", password: "3312501020" },
-      { username: "Jelita Aulia", password: "3312501021" },
-      { username: "Reyhan", password: "3312501022" },
-    ];
+    // Data login simple tanpa database
+    let akunTerdaftar = JSON.parse(localStorage.getItem("akun_mahasiswa"));
 
-    const akunRegister = JSON.parse(localStorage.getItem("daftarAkun")) || [];
-
-
-    const semuaAkun = [...akunDefault, ...akunRegister];
-
-    const cocok = semuaAkun.find(
-      (a) => a.username === username.value && a.password === password.value
-    );
-
-    if (cocok) {
-      alert("✅ Login Berhasil! Selamat datang, " + cocok.username);
-      localStorage.setItem("mahasiswa", cocok.username);
-      window.location.href = "jadwal_mahasiswa.html";
-    } else {
-      alert("❌ Username atau Password salah!");
+    if (!akunTerdaftar) {
+        alert("Akun tidak ditemukan! Silakan daftar terlebih dahulu.");
+        return;
     }
-  });
+
+    if (akunTerdaftar.username === username && akunTerdaftar.password === password) {
+        alert("Login berhasil!");
+        window.location.href = "jadwal.html"; 
+    } else {
+        alert("Username atau password salah!");
+    }
 });
