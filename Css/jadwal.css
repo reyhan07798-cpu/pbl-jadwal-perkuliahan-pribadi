@@ -1,0 +1,408 @@
+/* --- CSS Variables & Root --- */
+:root {
+    --primary-color: #4682B4;
+    --primary-dark: #1a4d80;
+    --primary-light: #7ba7d7;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --white-color: #ffffff;
+    --text-color: #212529;
+    --border-color: #dee2e6;
+    --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+}
+
+/* --- Base & Reset --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #5a87c4 100%);
+    color: var(--text-color);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* --- Layout --- */
+.app-container {
+    background: var(--white-color);
+    max-width: 1400px;
+    margin: 0 auto;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 40px);
+    overflow: hidden;
+}
+
+.app-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #5a87c4 100%);
+    color: var(--white-color);
+    padding: 20px 30px;
+    flex-shrink: 0;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left h1 {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.datetime-widget {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    backdrop-filter: blur(5px);
+}
+
+.datetime-day { font-weight: 600; }
+.datetime-time { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
+
+.app-nav {
+    display: flex;
+    background: var(--light-color);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.nav-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: transparent;
+    color: var(--primary-color);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.nav-btn.active, .nav-btn:hover {
+    background: var(--primary-color);
+    color: var(--white-color);
+}
+
+.app-main {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+
+/* --- Components --- */
+.card {
+    background: var(--white-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+}
+.btn-primary { background: var(--primary-color); color: var(--white-color); }
+.btn-secondary { background: var(--secondary-color); color: var(--white-color); }
+.btn-danger { background: var(--danger-color); color: var(--white-color); }
+.btn-info { background: var(--info-color); color: var(--white-color); }
+.btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+/* --- Schedule Page --- */
+.schedule-layout {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 20px;
+    height: 100%;
+}
+.schedule-sidebar, .notes-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.schedule-content, .notes-content {
+    display: flex;
+    flex-direction: column;
+}
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.schedule-table th, .schedule-table td {
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    text-align: center;
+}
+.schedule-table th {
+    background: var(--primary-dark);
+    color: var(--white-color);
+    font-weight: bold;
+}
+.schedule-table td {
+    height: 120px;
+    vertical-align: top;
+}
+.class-card {
+    background: var(--primary-light);
+    color: var(--text-color);
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.class-card:hover {
+    transform: scale(1.03);
+    box-shadow: var(--shadow);
+}
+.course-list-item {
+    background: var(--light-color);
+    border-left: 4px solid var(--primary-color);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+/* --- Calendar Page --- */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+.calendar-day-header {
+    text-align: center;
+    font-weight: bold;
+    padding: 10px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+}
+.calendar-day {
+    border: 1px solid var(--border-color);
+    min-height: 100px;
+    padding: 10px;
+    border-radius: var(--border-radius);
+    background: var(--white-color);
+}
+.calendar-day.today {
+    background: #FFDAB9;
+    border-color: #FFA07A;
+}
+.calendar-event, .calendar-note {
+    padding: 2px 5px;
+    margin-bottom: 3px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.calendar-event {
+    background: #A2F5B6;
+    color: var(--text-color);
+}
+.calendar-note {
+    background: #FFD700;
+    color: var(--text-color);
+}
+
+/* --- Notes Page --- */
+.notes-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+    height: 100%;
+}
+.notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+.note-card {
+    background: var(--white-color);
+    border: 1px solid var(--border-color);
+    border-top: 4px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+}
+.note-card:hover {
+    transform: translateY(-5px);
+}
+.note-card-title {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+.note-card-date {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+.note-card-preview {
+    color: var(--text-color);
+    font-size: 0.9rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    flex-grow: 1;
+}
+.note-card-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* --- Modal --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: var(--white-color);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--secondary-color);
+}
+.modal-title {
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+/* --- Toast --- */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 2000;
+}
+.toast {
+    background: var(--primary-color);
+    color: var(--white-color);
+    padding: 15px 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    animation: slideIn 0.3s ease;
+}
+.toast.success { background: var(--success-color); }
+.toast.error { background: var(--danger-color); }
+@keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+/* --- Utility --- */
+.w-100 { width: 100%; }
+.text-center { text-align: center;
+}
+
+.schedule-content .card h4,
+.schedule-content .card p {
+    text-align: center !important;
+    width: 100%;
+    display: block;
+}
+
+/* mengatur tata letak button edit sama hapus dibagian jadwal mingguan */
+.course-list-item {
+    background: var(--light-color);
+    border-left: 4px solid var(--primary-color);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.course-item-content {
+    flex-grow: 1;
+}
+
+.course-item-actions {
+    display: flex;
+    gap: 5px;
+}
