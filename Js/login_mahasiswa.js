@@ -1,50 +1,32 @@
-// =========================
-// HAPUS DATA MAHASISWA LAMA
-// =========================
-localStorage.removeItem("mahasiswa");
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("loginForm");
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+    const usernameError = document.getElementById("usernameError");
+    const passwordError = document.getElementById("passwordError");
 
-// =========================
-// LOGIN HANDLING
-// =========================
-document.getElementById("loginForm").addEventListener("submit", function (e) {
-    e.preventDefault();
+    form.addEventListener("submit", function (event) {
+        let valid = true;
 
-    let username = document.getElementById("username").value.trim();
-    let password = document.getElementById("password").value.trim();
-
-    let usernameError = document.getElementById("usernameError");
-    let passwordError = document.getElementById("passwordError");
-
-    let valid = true;
-
-    if (username === "") {
-        usernameError.style.display = "block";
-        valid = false;
-    } else {
+        // Reset error messages
         usernameError.style.display = "none";
-    }
-
-    if (password === "") {
-        passwordError.style.display = "block";
-        valid = false;
-    } else {
         passwordError.style.display = "none";
-    }
 
-    if (!valid) return;
+        // Validasi Username
+        if (username.value.trim() === "") {
+            usernameError.style.display = "block";
+            valid = false;
+        }
 
-    // Data login simple tanpa database
-    let akunTerdaftar = JSON.parse(localStorage.getItem("akun_mahasiswa"));
+        // Validasi Password
+        if (password.value.trim() === "") {
+            passwordError.style.display = "block";
+            valid = false;
+        }
 
-    if (!akunTerdaftar) {
-        alert("Akun tidak ditemukan! Silakan daftar terlebih dahulu.");
-        return;
-    }
-
-    if (akunTerdaftar.username === username && akunTerdaftar.password === password) {
-        alert("Login berhasil!");
-        window.location.href = "jadwal.html"; 
-    } else {
-        alert("Username atau password salah!");
-    }
+        // Jika tidak valid, cegah form dari submit
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
 });

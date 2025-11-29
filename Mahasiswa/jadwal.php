@@ -1,3 +1,17 @@
+<?php
+// Memulai session
+session_start();
+
+// Cek apakah user sudah login, jika belum redirect ke halaman login
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login_mahasiswa.php");
+    exit;
+}
+
+// Include file konfigurasi database
+require_once "config.php";
+?>
+ 
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -16,6 +30,11 @@
                     <p>Sistem Manajemen Jadwal Kuliah Pribadi</p>
                 </div>
                 <div class="header-right">
+                    <!-- Tambahkan nama user dan tombol logout -->
+                    <div class="user-info">
+                        <span><i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($_SESSION["username"]); ?></span>
+                        <a href="logout.php" class="btn btn-logout"><i class="bi bi-box-arrow-right"></i> Keluar</a>
+                    </div>
                     <div class="datetime-widget">
                         <div class="datetime-day" id="datetime-day">Senin</div>
                         <div class="datetime-date" id="datetime-date">24 November 2025</div>

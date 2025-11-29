@@ -1,51 +1,51 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("registerForm");
-  const username = document.getElementById("username");
-  const password = document.getElementById("password");
-  const confirmPassword = document.getElementById("confirmPassword");
+    const form = document.getElementById("registerForm");
+    const username = document.getElementById("username");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirmPassword");
 
-  const usernameError = document.getElementById("usernameError");
-  const passwordError = document.getElementById("passwordError");
-  const confirmPasswordError = document.getElementById("confirmPasswordError");
+    const usernameError = document.getElementById("usernameError");
+    const emailError = document.getElementById("emailError");
+    const passwordError = document.getElementById("passwordError");
+    const confirmPasswordError = document.getElementById("confirmPasswordError");
 
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
+    form.addEventListener("submit", function (event) {
+        let valid = true;
 
-    usernameError.style.display = "none";
-    passwordError.style.display = "none";
-    confirmPasswordError.style.display = "none";
+        // Reset error messages
+        usernameError.style.display = "none";
+        emailError.style.display = "none";
+        passwordError.style.display = "none";
+        confirmPasswordError.style.display = "none";
 
-    let valid = true;
+        // Validasi Username
+        if (username.value.trim() === "") {
+            usernameError.style.display = "block";
+            valid = false;
+        }
 
-    if (username.value.trim() === "") {
-      usernameError.style.display = "block";
-      valid = false;
-    }
+        // Validasi Email
+        if (email.value.trim() === "") {
+            emailError.style.display = "block";
+            valid = false;
+        }
 
-    if (password.value.trim() === "") {
-      passwordError.style.display = "block";
-      valid = false;
-    }
+        // Validasi Password
+        if (password.value.trim() === "") {
+            passwordError.style.display = "block";
+            valid = false;
+        }
 
-    if (confirmPassword.value.trim() === "" || confirmPassword.value !== password.value) {
-      confirmPasswordError.style.display = "block";
-      valid = false;
-    }
+        // Validasi Konfirmasi Password
+        if (confirmPassword.value.trim() === "" || confirmPassword.value !== password.value) {
+            confirmPasswordError.style.display = "block";
+            valid = false;
+        }
 
-    if (!valid) return;
-
-    let daftarAkun = JSON.parse(localStorage.getItem("daftarAkun")) || [];
-
-    const sudahAda = daftarAkun.find(a => a.username === username.value);
-    if (sudahAda) {
-      alert("⚠️ Username sudah terdaftar! Silakan gunakan username lain.");
-      return;
-    }
-
-    daftarAkun.push({ username: username.value, password: password.value });
-    localStorage.setItem("daftarAkun", JSON.stringify(daftarAkun));
-
-    alert("✅ Registrasi berhasil! Silakan login menggunakan akun Anda.");
-    window.location.href = "login.html";
-  });
+        // Jika tidak valid, cegah form dari submit
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
 });
