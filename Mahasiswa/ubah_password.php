@@ -4,7 +4,7 @@ require_once "config.php";
 
 // Cek apakah user sudah login, jika belum redirect ke halaman login
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
-    header("location: login.php");
+    header("location: login_mahasiswa.php");
     exit;
 }
 

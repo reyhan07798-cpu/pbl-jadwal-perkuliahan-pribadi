@@ -63,6 +63,12 @@ body {
     margin-bottom: 5px;
 }
 
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .datetime-widget {
     background: rgba(255, 255, 255, 0.2);
     padding: 10px 20px;
@@ -135,6 +141,7 @@ body {
 .btn-secondary { background: var(--secondary-color); color: var(--white-color); }
 .btn-danger { background: var(--danger-color); color: var(--white-color); }
 .btn-info { background: var(--info-color); color: var(--white-color); }
+.btn-logout { background: var(--danger-color); color: var(--white-color); }
 .btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
 .form-control {
@@ -160,12 +167,12 @@ body {
     gap: 20px;
     height: 100%;
 }
-.schedule-sidebar, .notes-sidebar {
+.schedule-sidebar {
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
-.schedule-content, .notes-content {
+.schedule-content {
     display: flex;
     flex-direction: column;
 }
@@ -207,6 +214,16 @@ body {
     padding: 10px;
     margin-bottom: 10px;
     border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.course-item-content {
+    flex-grow: 1;
+}
+.course-item-actions {
+    display: flex;
+    gap: 5px;
 }
 
 /* --- Calendar Page --- */
@@ -248,6 +265,7 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: all 0.2s ease-in-out;
 }
 .calendar-event {
     background: #A2F5B6;
@@ -257,14 +275,21 @@ body {
     background: #FFD700;
     color: var(--text-color);
 }
+.calendar-note:hover {
+    background-color: #ffed4e;
+    transform: scale(1.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
 
 /* --- Notes Page --- */
+/* ========================= PERUBAHAN DI SINI ========================= */
+/* Layout catatan sekarang hanya satu kolom */
 .notes-layout {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 20px;
+    display: block; /* Diubah dari grid */
     height: 100%;
 }
+/* ===================================================================== */
+
 .notes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -376,33 +401,5 @@ body {
 
 /* --- Utility --- */
 .w-100 { width: 100%; }
-.text-center { text-align: center;
-}
-
-.schedule-content .card h4,
-.schedule-content .card p {
-    text-align: center !important;
-    width: 100%;
-    display: block;
-}
-
-/* mengatur tata letak button edit sama hapus dibagian jadwal mingguan */
-.course-list-item {
-    background: var(--light-color);
-    border-left: 4px solid var(--primary-color);
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.course-item-content {
-    flex-grow: 1;
-}
-
-.course-item-actions {
-    display: flex;
-    gap: 5px;
-}
+.text-center { text-align: center; }
+.text-muted { color: var(--secondary-color); }

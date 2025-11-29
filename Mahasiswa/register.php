@@ -63,7 +63,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $param_email = $email;
             $param_password = password_hash($password, PASSWORD_DEFAULT);
             if($stmt->execute()){
-                header("location: login.php");
+                header("location: login_mahasiswa.php");
                 exit();
             } else{
                 $register_err = "Oops! Ada yang salah. Silakan coba lagi nanti.";
@@ -116,7 +116,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             </div>
                         </form>
                         <hr>
-                        <p class="text-center mb-0">Sudah punya akun? <a href="login.php">Login di sini</a>.</p>
+                        <p class="text-center mb-0">Sudah punya akun? <a href="login_mahasiswa.php">Login di sini</a>.</p>
                     </div>
                 </div>
             </div>

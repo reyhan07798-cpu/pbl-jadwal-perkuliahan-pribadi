@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reset'])) {
                 if ($stmt->execute()) {
                     unset($_SESSION['verified_for_reset']);
                     $success_msg = "Password berhasil diubah! Anda akan dialihkan ke halaman login dalam 3 detik.";
-                    header("refresh:3;url=login.php");
+                    header("refresh:3;url=login_mahasiswa.php");
                 }
                 $stmt->close();
             }
@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['reset'])) {
                                 <div class="d-grid"><button type="submit" name="reset" class="btn btn-success">Ubah Password</button></div>
                             </form>
                         <?php endif; ?>
-                        <hr><p class="text-center mb-0">Sudah ingat akun Anda? <a href="login.php">Login di sini</a>.</p>
+                        <hr><p class="text-center mb-0">Sudah ingat akun Anda? <a href="login_mahasiswa.php">Login di sini</a>.</p>
                     </div>
                 </div>
             </div>
