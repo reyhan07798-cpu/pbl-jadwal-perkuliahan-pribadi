@@ -119,7 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderScheduleTable() {
-        const thead = `<tr><th>Waktu</th>${DAYS.map(day => `<th>${day}</th>`).join('')}</tr>`;
+        // BARIS YANG SUDAH BENAR
+        const thead = `<tr>${DAYS.map(day => `<th>${day}</th>`).join('')}</tr>`;
         const tbody = `<tr>${DAYS.map(day => `<td data-day="${day}"></td>`).join('')}</tr>`;
         elements.scheduleTable.innerHTML = thead + tbody;
 
