@@ -23,24 +23,37 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $password = trim($_POST["password"]);
     }
     if(empty($username_err) && empty($password_err)){
+        // Memastikan query mencocokkan dengan struktur database
         $sql = "SELECT id, username, password, role FROM users WHERE username = ?";
+        
         if($stmt = $conn->prepare($sql)){
             $stmt->bind_param("s", $param_username);
             $param_username = $username;
+            
             if($stmt->execute()){
                 $stmt->store_result();
+                
                 if($stmt->num_rows == 1){
+                    // Mengikat hasil ke variabel
                     $stmt->bind_result($id, $username_db, $hashed_password, $role);
+                    
                     if($stmt->fetch()){
-                        if(password_verify($password, $hashed_password)){
-                            session_regenerate_id();
-                            $_SESSION["loggedin"] = true;
-                            $_SESSION["id"] = $id;
-                            $_SESSION["username"] = $username_db;
-                            $_SESSION["role"] = $role;
-                            header("location: jadwal.php");
-                        } else{
-                            $login_err = "Username atau password tidak valid.";
+                        // Memeriksa apakah password ada di database
+                        if(!empty($hashed_password)){
+                            // Verifikasi password
+                            if(password_verify($password, $hashed_password)){
+                                session_regenerate_id();
+                                $_SESSION["loggedin"] = true;
+                                $_SESSION["id"] = $id;
+                                $_SESSION["username"] = $username_db;
+                                $_SESSION["role"] = $role;
+                                header("location: jadwal.php");
+                            } else{
+                                $login_err = "Username atau password tidak valid.";
+                            }
+                        } else {
+                            // Jika password kosong di database
+                            $login_err = "Terjadi kesalahan dengan akun Anda. Silakan hubungi administrator.";
                         }
                     }
                 } else{
@@ -76,11 +89,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
-                                <input type="text" name="username" id="username" class="form-control" value="<?php echo htmlspecialchars($username); ?>">
+                                <input type="text" name="username" id="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($username); ?>">
+                                <?php if(!empty($username_err)){ echo '<div class="invalid-feedback">' . $username_err . '</div>'; } ?>
                             </div>    
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" name="password" id="password" class="form-control">
+                                <input type="password" name="password" id="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
+                                <?php if(!empty($password_err)){ echo '<div class="invalid-feedback">' . $password_err . '</div>'; } ?>
                             </div>
                             <div class="d-grid">
                                 <input type="submit" class="btn btn-primary" value="Login">
