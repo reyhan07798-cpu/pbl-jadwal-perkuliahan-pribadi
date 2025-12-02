@@ -4,7 +4,7 @@ session_start();
 
 // Cek apakah user sudah login, jika belum redirect ke halaman login
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
-    header("location: login.php"); // Sesuaikan dengan nama file login Anda
+    header("location: login_mahasiswa.php"); // Sesuaikan dengan nama file login Anda
     exit;
 }
 ?>
@@ -26,7 +26,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
             <div class="header-content">
                 <div class="header-left">
                     <h1><i class="bi bi-journal-bookmark-fill"></i> Jadwal Perkuliahan</h1>
-                    <p>Selamat datang, <b><?php echo htmlspecialchars($_SESSION["username"]); ?></b></p>
+                    <p>Selamat Datang Di Website Kami!<b><?php echo htmlspecialchars($_SESSION["username"]); ?></b></p>
                 </div>
                 <div class="header-right">
                     <div class="user-info">
