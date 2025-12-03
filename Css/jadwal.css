@@ -194,6 +194,7 @@ body {
     height: 120px;
     vertical-align: top;
 }
+
 .class-card {
     background: var(--primary-light);
     color: var(--text-color);

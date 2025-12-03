@@ -1,27 +1,34 @@
 <?php
-header('Content-Type: application/json');
-require_once "../config.php";
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json");
 
+require_once '../config.php';
 session_start();
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) { http_response_code(401); exit; }
 
- $user_id = $_SESSION['id'];
- $schedules = [];
-
- $sql = "SELECT s.id, s.day_of_week, s.start_time, s.end_time, s.room, c.course_name 
-        FROM schedules s
-        JOIN courses c ON s.course_id = c.id
-        WHERE s.user_id = ?";
-
-if ($stmt = $conn->prepare($sql)) {
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
-        $schedules[] = $row;
-    }
-    $stmt->close();
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    echo json_encode([]);
+    exit;
 }
- $conn->close();
-echo json_encode($schedules);
+
+$sql = "SELECT 
+            s.id,
+            s.hari,
+            s.jam_mulai,
+            c.nama_mk,
+            c.sks,
+            c.dosen,
+            c.ruangan
+        FROM schedules s
+        INNER JOIN courses c ON s.course_id = c.id
+        ORDER BY FIELD(s.hari, 'Senin','Selasa','Rabu','Kamis','Jumat'), s.jam_mulai";
+
+$result = $conn->query($sql);
+
+$data = [];
+while ($row = $result->fetch_assoc()) {
+    $data[] = $row;
+}
+
+echo json_encode($data);
+$conn->close();
 ?>

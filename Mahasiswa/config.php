@@ -1,15 +1,12 @@
 <?php
-// Konfigurasi Database
-define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
-define('DB_NAME', 'database_jadwal');
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "jadwal_mahasiswa";
 
-// Membuat koneksi
- $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+$conn = mysqli_connect($host, $user, $pass, $db);
 
-// Cek koneksi
-if ($conn->connect_error) {
-    die("ERROR: Tidak dapat terhubung. " . $conn->connect_error);
+if (!$conn) {
+    die("Database gagal: " . mysqli_connect_error());
 }
 ?>

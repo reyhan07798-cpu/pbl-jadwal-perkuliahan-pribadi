@@ -1,28 +1,48 @@
 <?php
-header('Content-Type: application/json');
-require_once "../config.php";
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json");
 
+require_once '../config.php';
 session_start();
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) { http_response_code(401); exit; }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_SESSION['id'];
-    $course_id = $_POST['course_id'];
-    $day_of_week = $_POST['day_of_week'];
-    $start_time = $_POST['start_time'];
-    $end_time = $_POST['end_time'];
-    $room = $_POST['room'];
-
-    $sql = "INSERT INTO schedules (user_id, course_id, day_of_week, start_time, end_time, room) VALUES (?, ?, ?, ?, ?, ?)";
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("iissss", $user_id, $course_id, $day_of_week, $start_time, $end_time, $room);
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Jadwal berhasil ditambahkan.']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Gagal menambahkan jadwal.']);
-        }
-        $stmt->close();
-    }
+if (!isset($_SESSION["loggedin"])) {
+    echo json_encode(["success" => false, "msg" => "Unauthorized"]);
+    exit;
 }
- $conn->close();
+
+if ($_SERVER["REQUEST_METHOD"] != "POST") {
+    echo json_encode(["success" => false, "msg" => "Method not allowed"]);
+    exit;
+}
+
+$nama_mk   = $_POST['course_name'];
+$sks       = $_POST['sks'];
+$dosen     = $_POST['dosen'];
+$ruangan   = $_POST['ruangan'];
+$hari      = $_POST['hari'];
+$jam_mulai = $_POST['jamMulai'];
+
+$sql_course = "INSERT INTO courses (nama_mk, sks, dosen, ruangan) VALUES (?,?,?,?)";
+$stmt = $conn->prepare($sql_course);
+$stmt->bind_param("siss", $nama_mk, $sks, $dosen, $ruangan);
+
+if ($stmt->execute()) {
+
+    $course_id = $conn->insert_id;
+
+    $sql_schedule = "INSERT INTO schedules (course_id, hari, jam_mulai) VALUES (?,?,?)";
+    $stmt2 = $conn->prepare($sql_schedule);
+    $stmt2->bind_param("iss", $course_id, $hari, $jam_mulai);
+
+    if ($stmt2->execute()) {
+        echo json_encode(["success" => true, "msg" => "Jadwal berhasil ditambahkan"]);
+    } else {
+        echo json_encode(["success" => false, "msg" => "Gagal tambah jadwal"]);
+    }
+
+    $stmt2->close();
+}
+
+$stmt->close();
+$conn->close();
 ?>
