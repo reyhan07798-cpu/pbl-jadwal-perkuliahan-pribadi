@@ -49,21 +49,18 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         </nav>
 
         <main class="app-main">
-
             <!-- Tab Jadwal Mingguan -->
-        <section class="tab-content active" id="schedule-tab">
-            <div class="schedule-layout">
-                <aside class="schedule-sidebar">
-            <div class="card">
-
-                <button id="add-course-btn" class="btn btn-primary w-100">
-                    <i class="bi bi-plus-lg"></i> Tambah Mata Kuliah
-                </button>
-
-                <input type="text" id="search-course" class="form-control" placeholder="Cari mata kuliah...">
-
-                    <div id="course-list"></div>
-
+            <section class="tab-content active" id="schedule-tab">
+                <div class="schedule-layout">
+                    <aside class="schedule-sidebar">
+                        <div class="card">
+                            <button id="add-course-btn" class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> Tambah Mata Kuliah</button>
+                        </div>
+                        <div class="card">
+                            <h5><i class="bi bi-list-ul"></i> Daftar Mata Kuliah</h5>
+                            <input type="text" class="form-control" id="search-course" placeholder="Cari mata kuliah atau dosen...">
+                            <div id="course-list"></div>
+                        </div>
                     </aside>
                     <div class="schedule-content">
                         <div class="card">

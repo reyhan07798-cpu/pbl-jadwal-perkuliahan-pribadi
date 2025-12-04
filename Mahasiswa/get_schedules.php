@@ -1,34 +1,27 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
+header('Content-Type: application/json');
+require_once "../config.php";
 
-require_once '../config.php';
 session_start();
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) { http_response_code(401); exit; }
 
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    echo json_encode([]);
-    exit;
-}
+ $user_id = $_SESSION['id'];
+ $schedules = [];
 
-$sql = "SELECT 
-            s.id,
-            s.hari,
-            s.jam_mulai,
-            c.nama_mk,
-            c.sks,
-            c.dosen,
-            c.ruangan
+ $sql = "SELECT s.id, s.day_of_week, s.start_time, s.end_time, s.room, c.course_name 
         FROM schedules s
-        INNER JOIN courses c ON s.course_id = c.id
-        ORDER BY FIELD(s.hari, 'Senin','Selasa','Rabu','Kamis','Jumat'), s.jam_mulai";
+        JOIN courses c ON s.course_id = c.id
+        WHERE s.user_id = ?";
 
-$result = $conn->query($sql);
-
-$data = [];
-while ($row = $result->fetch_assoc()) {
-    $data[] = $row;
+if ($stmt = $conn->prepare($sql)) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $schedules[] = $row;
+    }
+    $stmt->close();
 }
-
-echo json_encode($data);
-$conn->close();
+ $conn->close();
+echo json_encode($schedules);
 ?>
