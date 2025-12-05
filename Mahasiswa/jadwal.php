@@ -127,5 +127,6 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
     <!-- JavaScript -->
     <script src="../Js/jadwal.js"></script>
+    <script src="../Js/app.js"></script>
 </body>
 </html>
