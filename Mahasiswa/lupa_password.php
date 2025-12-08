@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "config.php";
+require_once "../koneksi.php";
  $username = $email = $new_password = "";
  $username_err = $email_err = $password_err = $success_msg = "";
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "config.php";
+require_once "../koneksi.php";
 
 // Cek apakah user sudah login, jika belum redirect ke halaman login
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){

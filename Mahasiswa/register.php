@@ -1,5 +1,5 @@
 <?php
-require_once "config.php";
+require_once "../koneksi.php";
  $username = $email = $password = $confirm_password = "";
  $username_err = $email_err = $password_err = $confirm_password_err = $register_err = "";
 

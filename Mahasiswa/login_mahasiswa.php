@@ -1,7 +1,7 @@
 <?php
 // Memulai session
 session_start();
-require_once "config.php";
+require_once "../koneksi.php";
 
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
     header("location: jadwal.php");
