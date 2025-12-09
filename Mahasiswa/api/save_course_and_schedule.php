@@ -18,7 +18,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_
 // Ambil user_id dari session
  $user_id = $_SESSION["id"];
 
-// Sertakan file koneksi
+// Sertakan file koneksi (PATH SUDAH DIPERBAIKI UNTUK STRUKTUR INI)
 require_once '../../koneksi.php';
 
 // Ambil data yang dikirim (dalam format JSON)

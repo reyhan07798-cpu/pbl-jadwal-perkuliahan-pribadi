@@ -12,6 +12,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_
 }
  $user_id = $_SESSION["id"];
 
+// PATH SUDAH DIPERBAIKI
 require_once '../../koneksi.php';
 
  $data = json_decode(file_get_contents("php://input"));

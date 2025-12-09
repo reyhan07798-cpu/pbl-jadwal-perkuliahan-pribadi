@@ -12,12 +12,13 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_
 
 require_once '../../koneksi.php';
 
+// Gunakan isset untuk memeriksa apakah parameter 'id' ada di URL
 if (isset($_GET['id'])) {
     $course_id = $_GET['id'];
 
     $sql = "SELECT c.id, c.course_name, c.sks, c.dosen, c.room, s.day_of_week, s.start_time, s.end_time
             FROM courses c
-            JOIN schedules s ON c.id = s.course_id
+            LEFT JOIN schedules s ON c.id = s.course_id
             WHERE c.id = ? AND c.user_id = ?";
     
     if ($stmt = $conn->prepare($sql)) {
@@ -29,13 +30,15 @@ if (isset($_GET['id'])) {
             echo json_encode($row);
         } else {
             http_response_code(404);
-            echo json_encode(array("message" => "Mata kuliah tidak ditemukan."));
+            echo json_encode(array("message" => "Mata kuliah tidak ditemukan atau bukan milik Anda."));
         }
         $stmt->close();
     }
 } else {
+    // Blok ini yang menghasilkan error "ID tidak disertakan"
     http_response_code(400);
     echo json_encode(array("message" => "ID tidak disertakan."));
 }
+
  $conn->close();
 ?>

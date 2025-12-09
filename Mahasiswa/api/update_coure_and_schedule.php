@@ -12,7 +12,8 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_
 }
  $user_id = $_SESSION["id"];
 
-require_once '../koneksi.php';
+// PATH SUDAH DIPERBAIKI SESUAI STRUKTUR ANDA
+require_once '../../koneksi.php';
 
  $data = json_decode(file_get_contents("php://input"));
 
@@ -31,6 +32,7 @@ if (
         // Update tabel courses
         $sql_course = "UPDATE courses SET course_name = ?, sks = ?, dosen = ?, room = ? WHERE id = ? AND user_id = ?";
         $stmt_course = $conn->prepare($sql_course);
+        // Perbaiki tipe data bind_param: 's' untuk string, 'i' untuk integer
         $stmt_course->bind_param("sisiii", $data->course_name, $data->sks, $data->dosen, $data->room, $data->course_id, $user_id);
         $stmt_course->execute();
 

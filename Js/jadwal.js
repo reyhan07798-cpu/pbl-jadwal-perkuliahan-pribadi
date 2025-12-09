@@ -1,17 +1,17 @@
 /**
  * @fileoverview Manages the entire student schedule application UI and logic.
  * Handles course scheduling, calendar view, notes, and data synchronization with a server.
- * @version 4.0 - Lengkap dengan fitur Edit dan Hapus
+ * @version 5.1 - Debug Version: Ditambahkan console.log untuk melacak masalah.
  */
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
     // --- KONFIGURASI & STATE ---
-    const API_BASE_URL = './api/'; // Path ke folder API Anda
+    const API_BASE_URL = './api/';
 
     const state = {
         courses: [],
-        schedules: [], // Menggunakan schedules yang sudah digabung dari server
+        schedules: [],
         notes: [],
         currentMonth: new Date().getMonth(),
         currentYear: new Date().getFullYear(),
@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return result;
         },
         async getCourseById(courseId) {
+            // TAMBAHKAN CONSOLE LOG DI SINI
+            console.log(`API: Mengambil course dengan ID: ${courseId}`);
             const response = await fetch(`${API_BASE_URL}get_course.php?id=${courseId}`);
             if (!response.ok) throw new Error('Gagal mengambil data mata kuliah.');
             return await response.json();
@@ -97,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function init() {
         setupEventListeners();
         initializeUI();
-        loadData(); // Memuat data dari server saat pertama kali
+        loadData();
     }
 
     function initializeUI() {
@@ -125,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
             state.courses = Array.from(uniqueCourses.values());
             state.notes = [];
             renderAll();
-            showToast("Jadwal berhasil dimuat dari server!", 'success');
         } catch (error) {
             console.error("Failed to load data:", error);
             showToast(error.message, 'error');
@@ -203,23 +204,38 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleScheduleClick(e) {
         const classCard = e.target.closest('.class-card');
         if (!classCard) return;
-
-        const courseId = parseInt(classCard.dataset.id);
-        if (e.target.closest('.btn-edit')) {
-            handleEditSchedule(courseId);
-        } else if (e.target.closest('.btn-delete')) {
-            handleDeleteSchedule(courseId);
-        } else {
-            viewCourse(courseId);
-        }
+        viewCourse(parseInt(classCard.dataset.id));
     }
 
     function handleCourseListClick(e) {
-        const courseItem = e.target.closest('.course-list-item'); if (!courseItem) return;
-        const id = parseInt(courseItem.dataset.id);
-        if (e.target.closest('.btn-info')) editCourse(id);
-        else if (e.target.closest('.btn-danger')) deleteCourse(id);
-        else viewCourse(id);
+        const courseItem = e.target.closest('.course-list-item');
+        if (!courseItem) return;
+
+        const courseIdString = courseItem.dataset.id;
+        const courseId = parseInt(courseIdString);
+
+        // TAMBAHKAN CONSOLE LOG UNTUK DEBUGGING
+        console.log("Klik terdeteksi pada course list item.");
+        console.log("Elemen courseItem:", courseItem);
+        console.log("courseIdString (dari data-id):", courseIdString);
+        console.log("courseId (setelah parseInt):", courseId);
+
+        if (!courseIdString || isNaN(courseId)) {
+            console.error("ID tidak valid atau tidak ditemukan:", courseIdString);
+            showToast("Terjadi kesalahan: ID mata kuliah tidak valid. Silakan muat ulang halaman.", 'error');
+            return;
+        }
+
+        if (e.target.closest('.btn-info')) {
+            console.log("Tombol Edit diklik.");
+            handleEditSchedule(courseId);
+        } else if (e.target.closest('.btn-danger')) {
+            console.log("Tombol Hapus diklik.");
+            handleDeleteSchedule(courseId);
+        } else {
+            console.log("Konten item diklik (bukan tombol).");
+            viewCourse(courseId);
+        }
     }
 
     async function handleAddCourse(e) {
@@ -239,19 +255,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await api.saveCourseAndSchedule(courseData);
             showToast(result.message, 'success');
             await loadData();
-            hideModal();
         } catch (error) {
             console.error('Error saving course:', error);
             showToast(error.message, 'error');
         } finally {
             hideLoading(submitBtn, originalText);
+            hideModal();
         }
     }
 
-    // --- HANDLER UNTUK EDIT & HAPUS ---
     async function handleEditSchedule(courseId) {
+        // TAMBAHKAN CONSOLE LOG DI SINI
+        console.log(`handleEditSchedule dipanggil dengan ID: ${courseId}`);
         try {
             const courseData = await api.getCourseById(courseId);
+            const dayOfWeek = courseData.day_of_week || '';
+            const startTime = courseData.start_time || '';
+            const endTime = courseData.end_time || '';
             
             const formHtml = `
                 <form id="edit-course-form">
@@ -260,16 +280,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="form-group"><label>SKS</label><input type="number" class="form-control" name="sks" value="${courseData.sks}" required></div>
                     <div class="form-group"><label>Dosen</label><input type="text" class="form-control" name="dosen" value="${courseData.dosen}" required></div>
                     <div class="form-group"><label>Ruangan</label><input type="text" class="form-control" name="room" value="${courseData.room}" required></div>
-                    <div class="form-group"><label>Hari</label><select class="form-control" name="hari" required>${DAYS.map(d => `<option value="${d}" ${courseData.day_of_week === d ? 'selected' : ''}>${d}</option>`).join('')}</select></div>
-                    <div class="form-group"><label>Jam Mulai</label><input type="time" class="form-control" name="jamMulai" value="${courseData.start_time}" required></div>
-                    <div class="form-group"><label>Jam Selesai</label><input type="time" class="form-control" name="jamSelesai" value="${courseData.end_time}" required></div>
+                    <div class="form-group"><label>Hari</label><select class="form-control" name="hari" required>${DAYS.map(d => `<option value="${d}" ${dayOfWeek === d ? 'selected' : ''}>${d}</option>`).join('')}</select></div>
+                    <div class="form-group"><label>Jam Mulai</label><input type="time" class="form-control" name="jamMulai" value="${startTime}" required></div>
+                    <div class="form-group"><label>Jam Selesai</label><input type="time" class="form-control" name="jamSelesai" value="${endTime}" required></div>
                     <button type="submit" class="btn btn-primary">Perbarui</button>
                 </form>
             `;
             showModal(`Edit Mata Kuliah: ${courseData.course_name}`, formHtml);
-            
             document.getElementById('edit-course-form').addEventListener('submit', handleUpdateSchedule);
-
         } catch (error) {
             showToast(error.message, 'error');
         }
@@ -293,19 +311,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await api.updateCourseAndSchedule(courseData);
             showToast(result.message, 'success');
             await loadData();
-            hideModal();
         } catch (error) {
             console.error('Error updating course:', error);
             showToast(error.message, 'error');
         } finally {
             hideLoading(submitBtn, originalText);
+            hideModal();
         }
     }
 
     async function handleDeleteSchedule(courseId) {
         const course = state.courses.find(c => c.id === courseId);
         if (!course) return;
-
         if (!confirm(`Yakin ingin menghapus mata kuliah "${course.nama}"?`)) return;
 
         try {
@@ -317,7 +334,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(error.message, 'error');
         }
     }
-
 
     // --- UI HELPERS ---
     const debounce = (func, delay) => { let timeoutId; return (...args) => { clearTimeout(timeoutId); timeoutId = setTimeout(() => func.apply(this, args), delay); }; };
@@ -388,8 +404,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showModal('Tambah Mata Kuliah', formHtml);
         document.getElementById('course-form').addEventListener('submit', handleAddCourse);
     }
-    function editCourse(id) { showToast("Fitur edit dari daftar akan segera hadir.", 'info'); }
-    function deleteCourse(id) { showToast("Fitur hapus dari daftar akan segera hadir.", 'info'); }
 
     // --- HTML TEMPLATES ---
     function createClassCard(course, scheduleItem) {
@@ -398,10 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="class-card-content">
                     <strong>${course.nama}</strong><br>
                     <small>${scheduleItem.start_time} - ${scheduleItem.end_time} | ${course.ruangan}</small>
-                </div>
-                <div class="class-card-actions">
-                    <button class="btn btn-sm btn-edit" title="Edit"><i class="bi bi-pencil"></i></button>
-                    <button class="btn btn-sm btn-delete" title="Hapus"><i class="bi bi-trash"></i></button>
                 </div>
             </div>
         `;
