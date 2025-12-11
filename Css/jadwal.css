@@ -282,9 +282,43 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* --- Notes Page --- */
-/* ========================= PERUBAHAN DI SINI ========================= */
-/* Layout catatan sekarang hanya satu kolom */
+
+/* style.css */
+.calendar-event {
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.calendar-event:hover {
+    background-color: #28a745; /* Warna hijau saat hover */
+    color: white;
+    transform: scale(1.02);
+}
+
+/* Gaya untuk daftar catatan di dalam modal */
+.notes-list-in-modal {
+    margin-top: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.note-snippet {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.note-snippet:hover {
+    background-color: #e9ecef;
+}
+
+.note-snippet strong {
+    display: block;
+    margin-bottom: 5px;
+}
 .notes-layout {
     display: block; /* Diubah dari grid */
     height: 100%;

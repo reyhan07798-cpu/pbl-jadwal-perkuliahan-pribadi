@@ -1,12 +1,13 @@
 /**
  * @fileoverview Manages the entire student schedule application UI and logic.
- * Handles course scheduling, calendar view, notes, and data synchronization with a server.
- * @version 5.1 - Debug Version: Ditambahkan console.log untuk melacak masalah.
+ * Handles course scheduling, calendar view, notes with dates, and data synchronization with a server.
+ * @version 8.4 - Notes with Dates and Full Calendar Integration
  */
+
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
-    // --- KONFIGURASI & STATE ---
+    // --- KONFIGURASI & STATE GLOBAL ---
     const API_BASE_URL = './api/';
 
     const state = {
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const DAY_MAP = { 0: 'Minggu', 1: 'Senin', 2: 'Selasa', 3: 'Rabu', 4: 'Kamis', 5: 'Jumat', 6: 'Sabtu' };
     const MONTH_NAMES = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-    // --- DOM ELEMENTS ---
+    // --- ELEMEN-ELEMEN DOM ---
     const elements = {
         navBtns: document.querySelectorAll('.nav-btn'),
         tabContents: document.querySelectorAll('.tab-content'),
@@ -34,28 +35,33 @@ document.addEventListener('DOMContentLoaded', () => {
         calendarMonthYear: document.getElementById('calendar-month-year'),
         prevMonthBtn: document.getElementById('prev-month-btn'),
         nextMonthBtn: document.getElementById('next-month-btn'),
+        // Elemen untuk Notes
         addNoteBtn: document.getElementById('add-note-btn'),
         notesGrid: document.getElementById('notes-grid'),
+        // Elemen Modal
         modalContainer: document.getElementById('modal-container'),
         modalTitle: document.getElementById('modal-title'),
         modalBody: document.getElementById('modal-body'),
         modalClose: document.querySelector('.modal-close'),
+        // Elemen Lainnya
         toastContainer: document.getElementById('toast-container'),
         datetimeDay: document.getElementById('datetime-day'),
         datetimeDate: document.getElementById('datetime-date'),
         datetimeTime: document.getElementById('datetime-time'),
     };
 
-    // --- API HANDLERS ---
+    // --- API HANDLERS (untuk komunikasi dengan backend) ---
     const api = {
         async fetchSchedule() {
-            const response = await fetch(`${API_BASE_URL}get_schedule.php`);
+            const cacheBuster = new Date().getTime();
+            const response = await fetch(`${API_BASE_URL}get_schedule.php?_=${cacheBuster}`, { cache: "no-store" });
             if (!response.ok) {
-                const errorData = await response.json();
+                const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Gagal mengambil jadwal dari server.');
             }
             return await response.json();
         },
+
         async saveCourseAndSchedule(courseData) {
             const response = await fetch(`${API_BASE_URL}save_course_and_schedule.php`, {
                 method: 'POST',
@@ -66,6 +72,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(result.message || 'Gagal menyimpan data ke server.');
             return result;
         },
+
+        async getCourseById(courseId) {
+            const response = await fetch(`${API_BASE_URL}get_course.php?id=${courseId}`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Gagal mengambil data mata kuliah.');
+            }
+            return await response.json();
+        },
+
+        async updateCourseAndSchedule(courseData) {
+            const response = await fetch(`${API_BASE_URL}update_course_and_schedule.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(courseData),
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Gagal memperbarui data.');
+            return result;
+        },
+
         async deleteSchedule(courseId) {
             const response = await fetch(`${API_BASE_URL}delete_schedule.php`, {
                 method: 'POST',
@@ -76,26 +103,50 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(result.message || 'Gagal menghapus jadwal.');
             return result;
         },
-        async getCourseById(courseId) {
-            // TAMBAHKAN CONSOLE LOG DI SINI
-            console.log(`API: Mengambil course dengan ID: ${courseId}`);
-            const response = await fetch(`${API_BASE_URL}get_course.php?id=${courseId}`);
-            if (!response.ok) throw new Error('Gagal mengambil data mata kuliah.');
+        
+        // --- API untuk Notes ---
+        async fetchNotes() {
+            const cacheBuster = new Date().getTime();
+            const response = await fetch(`${API_BASE_URL}get_notes.php?_=${cacheBuster}`, { cache: "no-store" });
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Gagal mengambil catatan.');
+            }
             return await response.json();
         },
-        async updateCourseAndSchedule(courseData) {
-            const response = await fetch(`${API_BASE_URL}update_course_and_schedule.php`, {
+        async addNote(noteData) {
+            const response = await fetch(`${API_BASE_URL}add_note.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(courseData),
+                body: JSON.stringify(noteData),
             });
             const result = await response.json();
-            if (!response.ok) throw new Error(result.message || 'Gagal memperbarui data.');
+            if (!response.ok) throw new Error(result.message || 'Gagal menambah catatan.');
+            return result;
+        },
+        async updateNote(noteData) {
+            const response = await fetch(`${API_BASE_URL}edit_note.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(noteData),
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Gagal memperbarui catatan.');
+            return result;
+        },
+        async deleteNote(noteId) {
+            const response = await fetch(`${API_BASE_URL}delete_note.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: noteId }),
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || 'Gagal menghapus catatan.');
             return result;
         }
     };
 
-    // --- INITIALIZATION ---
+    // --- INISIALISASI APLIKASI ---
     function init() {
         setupEventListeners();
         initializeUI();
@@ -108,10 +159,15 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCurrentWeekDate();
     }
 
-    // --- DATA MANAGEMENT ---
+    // --- MANAJEMEN DATA ---
     async function loadData() {
         try {
-            state.schedules = await api.fetchSchedule();
+            const [schedulesData, notesData] = await Promise.all([
+                api.fetchSchedule(),
+                api.fetchNotes()
+            ]);
+
+            state.schedules = schedulesData;
             const uniqueCourses = new Map();
             state.schedules.forEach(schedule => {
                 if (!uniqueCourses.has(schedule.course_id)) {
@@ -125,7 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             state.courses = Array.from(uniqueCourses.values());
-            state.notes = [];
+            state.notes = notesData;
+
             renderAll();
         } catch (error) {
             console.error("Failed to load data:", error);
@@ -134,23 +191,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- EVENT LISTENERS ---
+    // --- PEMROSES EVENT (EVENT LISTENERS) ---
     function setupEventListeners() {
         elements.navBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
         elements.addCourseBtn.addEventListener('click', showAddCourseModal);
         elements.searchCourseInput.addEventListener('input', debounce((e) => renderCourseList(e.target.value), 300));
+        
         elements.scheduleTable.addEventListener('click', handleScheduleClick);
         elements.courseList.addEventListener('click', handleCourseListClick);
+        
         elements.prevMonthBtn.addEventListener('click', () => changeMonth(-1));
         elements.nextMonthBtn.addEventListener('click', () => changeMonth(1));
-        elements.addNoteBtn.addEventListener('click', () => showToast("Fitur catatan akan segera hadir.", 'info'));
-        elements.notesGrid.addEventListener('click', () => showToast("Fitur catatan akan segera hadir.", 'info'));
+        
+        elements.addNoteBtn.addEventListener('click', showAddNoteModal);
+        elements.notesGrid.addEventListener('click', handleNotesClick);
+
+        // Event listener untuk interaksi kalender (jadwal dan catatan)
+        elements.calendarGrid.addEventListener('click', handleCalendarEventClick);
+
         elements.modalClose.addEventListener('click', hideModal);
         elements.modalContainer.addEventListener('click', (e) => { if (e.target === elements.modalContainer) hideModal(); });
     }
 
-    // --- RENDER FUNCTIONS ---
-    function renderAll() { renderScheduleTable(); renderCourseList(); renderCalendar(); renderNotes(); }
+    // --- FUNGSI-FUNGSI RENDER UNTUK MENAMPILKAN UI ---
+    function renderAll() {
+        renderScheduleTable();
+        renderCourseList();
+        renderCalendar();
+        renderNotes();
+    }
     
     function renderScheduleTable() {
         const thead = `<tr>${DAYS.map(day => `<th>${day}</th>`).join('')}</tr>`;
@@ -181,7 +250,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCalendar() {
         const firstDay = new Date(state.currentYear, state.currentMonth, 1).getDay();
         const daysInMonth = new Date(state.currentYear, state.currentMonth + 1, 0).getDate();
-        let html = DAY_MAP.slice(0, 7).map(day => `<div class="calendar-day-header">${day}</div>`).join('');
+        
+        // PERBAIKAN: Gunakan Object.values() untuk mengubah DAY_MAP menjadi array
+        let html = Object.values(DAY_MAP).map(day => `<div class="calendar-day-header">${day}</div>`).join('');
+
         for (let i = 0; i < firstDay; i++) html += `<div class="calendar-day other-month"></div>`;
         for (let date = 1; date <= daysInMonth; date++) {
             const dateStr = `${state.currentYear}-${String(state.currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
@@ -197,44 +269,106 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderNotes() {
-        elements.notesGrid.innerHTML = '<p class="text-center text-muted">Fitur catatan belum tersedia.</p>';
+        if (state.notes.length === 0) {
+            elements.notesGrid.innerHTML = '<p class="text-center text-muted">Belum ada catatan. Tambah catatan baru!</p>';
+            return;
+        }
+        elements.notesGrid.innerHTML = state.notes.map(note => createNoteCard(note)).join('');
     }
 
-    // --- HANDLERS ---
+    // --- HANDLER UNTUK INTERAKSI PENGGUNA ---
     function handleScheduleClick(e) {
         const classCard = e.target.closest('.class-card');
-        if (!classCard) return;
-        viewCourse(parseInt(classCard.dataset.id));
+        if (classCard) {
+            viewCourse(parseInt(classCard.dataset.id));
+        }
     }
 
     function handleCourseListClick(e) {
         const courseItem = e.target.closest('.course-list-item');
         if (!courseItem) return;
 
-        const courseIdString = courseItem.dataset.id;
-        const courseId = parseInt(courseIdString);
-
-        // TAMBAHKAN CONSOLE LOG UNTUK DEBUGGING
-        console.log("Klik terdeteksi pada course list item.");
-        console.log("Elemen courseItem:", courseItem);
-        console.log("courseIdString (dari data-id):", courseIdString);
-        console.log("courseId (setelah parseInt):", courseId);
-
-        if (!courseIdString || isNaN(courseId)) {
-            console.error("ID tidak valid atau tidak ditemukan:", courseIdString);
-            showToast("Terjadi kesalahan: ID mata kuliah tidak valid. Silakan muat ulang halaman.", 'error');
+        const courseId = parseInt(courseItem.dataset.id);
+        if (isNaN(courseId)) {
+            console.error("ID tidak valid:", courseItem.dataset.id);
+            showToast("Terjadi kesalahan: ID mata kuliah tidak valid.", 'error');
             return;
         }
 
         if (e.target.closest('.btn-info')) {
-            console.log("Tombol Edit diklik.");
             handleEditSchedule(courseId);
         } else if (e.target.closest('.btn-danger')) {
-            console.log("Tombol Hapus diklik.");
             handleDeleteSchedule(courseId);
         } else {
-            console.log("Konten item diklik (bukan tombol).");
             viewCourse(courseId);
+        }
+    }
+
+    // --- FUNGSI UNTUK MENANGANI KLIK PADA EVENT KALENDER (JADWAL & CATATAN) ---
+    function handleCalendarEventClick(e) {
+        const eventEl = e.target.closest('.calendar-event');
+        const noteEl = e.target.closest('.calendar-note');
+
+        if (eventEl) {
+            // Logika jika yang diklik adalah jadwal
+            const courseId = parseInt(eventEl.dataset.courseId);
+            const dayEl = eventEl.closest('.calendar-day');
+            const dateStr = dayEl.dataset.date;
+
+            const course = state.courses.find(c => c.id === courseId);
+            const schedule = state.schedules.find(s => s.course_id === courseId && s.day_of_week === dayEl.dataset.dayName);
+            
+            if (!course || !schedule) {
+                showToast('Detail jadwal tidak ditemukan.', 'error');
+                return;
+            }
+
+            // Cari catatan berdasarkan note_date yang sama dengan tanggal di kalender
+            const notesForTheDay = state.notes.filter(note => note.note_date === dateStr);
+
+            let modalBody = `
+                <div class="schedule-detail">
+                    <h4>${course.nama}</h4>
+                    <p><strong>Dosen:</strong> ${course.dosen}</p>
+                    <p><strong>SKS:</strong> ${course.sks}</p>
+                    <p><strong>Ruangan:</strong> ${course.ruangan}</p>
+                    <p><strong>Hari:</strong> ${schedule.day_of_week}</p>
+                    <p><strong>Waktu:</strong> ${schedule.start_time} - ${schedule.end_time}</p>
+                </div>
+            `;
+
+            if (notesForTheDay.length > 0) {
+                modalBody += `
+                    <hr>
+                    <h4>Catatan pada Tanggal Ini</h4>
+                    <div class="notes-list-in-modal">
+                        ${notesForTheDay.map(note => `
+                            <div class="note-snippet" data-note-id="${note.id}">
+                                <strong>${note.title}</strong>
+                                <p>${note.content.substring(0, 80)}${note.content.length > 80 ? '...' : ''}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                modalBody += `<hr><p><em>Tidak ada catatan untuk tanggal ${new Date(dateStr + 'T00:00:00').toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}.</em></p>`;
+            }
+
+            showModal(`Detail Jadwal`, modalBody);
+
+            const modalNotesContainer = elements.modalBody.querySelector('.notes-list-in-modal');
+            if (modalNotesContainer) {
+                modalNotesContainer.addEventListener('click', (e) => {
+                    const snippet = e.target.closest('.note-snippet');
+                    if (snippet) {
+                        viewNote(parseInt(snippet.dataset.noteId));
+                    }
+                });
+            }
+        } else if (noteEl) {
+            // Logika jika yang diklik adalah catatan, tampilkan langsung modal catatan
+            const noteId = parseInt(noteEl.dataset.noteId);
+            viewNote(noteId);
         }
     }
 
@@ -265,14 +399,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleEditSchedule(courseId) {
-        // TAMBAHKAN CONSOLE LOG DI SINI
-        console.log(`handleEditSchedule dipanggil dengan ID: ${courseId}`);
         try {
             const courseData = await api.getCourseById(courseId);
-            const dayOfWeek = courseData.day_of_week || '';
-            const startTime = courseData.start_time || '';
-            const endTime = courseData.end_time || '';
-            
             const formHtml = `
                 <form id="edit-course-form">
                     <input type="hidden" name="course_id" value="${courseData.id}">
@@ -280,15 +408,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="form-group"><label>SKS</label><input type="number" class="form-control" name="sks" value="${courseData.sks}" required></div>
                     <div class="form-group"><label>Dosen</label><input type="text" class="form-control" name="dosen" value="${courseData.dosen}" required></div>
                     <div class="form-group"><label>Ruangan</label><input type="text" class="form-control" name="room" value="${courseData.room}" required></div>
-                    <div class="form-group"><label>Hari</label><select class="form-control" name="hari" required>${DAYS.map(d => `<option value="${d}" ${dayOfWeek === d ? 'selected' : ''}>${d}</option>`).join('')}</select></div>
-                    <div class="form-group"><label>Jam Mulai</label><input type="time" class="form-control" name="jamMulai" value="${startTime}" required></div>
-                    <div class="form-group"><label>Jam Selesai</label><input type="time" class="form-control" name="jamSelesai" value="${endTime}" required></div>
+                    <div class="form-group"><label>Hari</label><select class="form-control" name="hari" required>${DAYS.map(d => `<option value="${d}" ${courseData.day_of_week === d ? 'selected' : ''}>${d}</option>`).join('')}</select></div>
+                    <div class="form-group"><label>Jam Mulai</label><input type="time" class="form-control" name="jamMulai" value="${courseData.start_time || ''}" required></div>
+                    <div class="form-group"><label>Jam Selesai</label><input type="time" class="form-control" name="jamSelesai" value="${courseData.end_time || ''}" required></div>
                     <button type="submit" class="btn btn-primary">Perbarui</button>
                 </form>
             `;
             showModal(`Edit Mata Kuliah: ${courseData.course_name}`, formHtml);
             document.getElementById('edit-course-form').addEventListener('submit', handleUpdateSchedule);
         } catch (error) {
+            console.error('Error di handleEditSchedule:', error);
             showToast(error.message, 'error');
         }
     }
@@ -335,7 +464,126 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- UI HELPERS ---
+    // --- HANDLER UNTUK NOTES ---
+    function handleNotesClick(e) {
+        const noteCard = e.target.closest('.note-card');
+        if (!noteCard) return;
+        const noteId = parseInt(noteCard.dataset.id);
+
+        if (e.target.closest('.btn-delete-note')) {
+            if (confirm('Yakin ingin menghapus catatan ini?')) {
+                handleDeleteNote(noteId);
+            }
+        } else if (e.target.closest('.btn-edit-note')) {
+            handleEditNote(noteId);
+        } else {
+            viewNote(noteId);
+        }
+    }
+
+    // --- FUNGSI UNTUK MENAMPILKAN MODAL TAMBAH CATATAN ---
+    function showAddNoteModal() {
+        // Ambil tanggal hari ini untuk nilai default
+        const today = new Date().toISOString().split('T')[0];
+        const formHtml = `
+            <form id="note-form">
+                <div class="form-group"><label>Judul Catatan</label><input type="text" class="form-control" name="note_title" required></div>
+                <!-- TAMBAHKAN: Input untuk tanggal catatan -->
+                <div class="form-group"><label>Tanggal Catatan</label><input type="date" class="form-control" name="note_date" value="${today}" required></div>
+                <div class="form-group"><label>Isi Catatan</label><textarea class="form-control" name="note_content" rows="8" required></textarea></div>
+                <button type="submit" class="btn btn-primary">Simpan Catatan</button>
+            </form>
+        `;
+        showModal('Tambah Catatan Baru', formHtml);
+        document.getElementById('note-form').addEventListener('submit', handleAddNote);
+    }
+
+    async function handleAddNote(e) {
+        e.preventDefault();
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        showLoading(submitBtn, originalText);
+
+        const formData = new FormData(e.target);
+        const noteData = {
+            title: formData.get('note_title'),
+            content: formData.get('note_content'),
+            // TAMBAHKAN: Kirim note_date ke backend
+            note_date: formData.get('note_date'),
+        };
+        
+        try {
+            const result = await api.addNote(noteData);
+            showToast(result.message, 'success');
+            await loadData();
+        } catch (error) {
+            console.error('Error saving note:', error);
+            showToast(error.message, 'error');
+        } finally {
+            hideLoading(submitBtn, originalText);
+            hideModal();
+        }
+    }
+
+    // --- FUNGSI UNTUK MENAMPILKAN MODAL EDIT CATATAN ---
+    async function handleEditNote(noteId) {
+        const note = state.notes.find(n => n.id === noteId);
+        if (!note) return;
+
+        const formHtml = `
+            <form id="edit-note-form">
+                <input type="hidden" name="note_id" value="${note.id}">
+                <div class="form-group"><label>Judul Catatan</label><input type="text" class="form-control" name="note_title" value="${note.title}" required></div>
+                <!-- TAMBAHKAN: Input untuk tanggal catatan dengan nilai yang ada -->
+                <div class="form-group"><label>Tanggal Catatan</label><input type="date" class="form-control" name="note_date" value="${note.note_date}" required></div>
+                <div class="form-group"><label>Isi Catatan</label><textarea class="form-control" name="note_content" rows="8" required>${note.content}</textarea></div>
+                <button type="submit" class="btn btn-primary">Perbarui Catatan</button>
+            </form>
+        `;
+        showModal(`Edit Catatan: ${note.title}`, formHtml);
+        document.getElementById('edit-note-form').addEventListener('submit', handleUpdateNote);
+    }
+
+    async function handleUpdateNote(e) {
+        e.preventDefault();
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        showLoading(submitBtn, originalText);
+
+        const formData = new FormData(e.target);
+        const noteData = {
+            id: parseInt(formData.get('note_id')),
+            title: formData.get('note_title'),
+            content: formData.get('note_content'),
+            // TAMBAHKAN: Kirim note_date ke backend
+            note_date: formData.get('note_date'),
+        };
+        
+        try {
+            const result = await api.updateNote(noteData);
+            showToast(result.message, 'success');
+            await loadData();
+        } catch (error) {
+            console.error('Error updating note:', error);
+            showToast(error.message, 'error');
+        } finally {
+            hideLoading(submitBtn, originalText);
+            hideModal();
+        }
+    }
+
+    async function handleDeleteNote(noteId) {
+        try {
+            const result = await api.deleteNote(noteId);
+            showToast(result.message, 'success');
+            await loadData();
+        } catch (error) {
+            console.error('Error deleting note:', error);
+            showToast(error.message, 'error');
+        }
+    }
+
+    // --- FUNGSI BANTUAN UI (UI HELPERS) ---
     const debounce = (func, delay) => { let timeoutId; return (...args) => { clearTimeout(timeoutId); timeoutId = setTimeout(() => func.apply(this, args), delay); }; };
     const showLoading = (button, originalText) => { button.disabled = true; button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...`; };
     const hideLoading = (button, originalText) => { button.disabled = false; button.innerHTML = originalText; };
@@ -375,9 +623,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCalendar();
     }
 
-    // --- VIEW & MODAL FUNCTIONS ---
+    // --- FUNGSI UNTUK MENAMPILKAN DETAIL DAN MODAL ---
     function viewCourse(id) {
-        const course = state.courses.find(c => c.id === id); if (!course) return;
+        const course = state.courses.find(c => c.id === id);
+        if (!course) return;
         const schedule = state.schedules.find(s => s.course_id === id);
         const modalBody = `
             <p><strong>SKS:</strong> ${course.sks}</p>
@@ -388,6 +637,14 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         showModal(course.nama, modalBody);
     }
+
+    function viewNote(noteId) {
+        const note = state.notes.find(n => n.id === noteId);
+        if (!note) return;
+        const modalBody = `<p>${note.content.replace(/\n/g, '<br>')}</p>`;
+        showModal(note.title, modalBody);
+    }
+
     function showAddCourseModal() {
         const formHtml = `
             <form id="course-form">
@@ -430,17 +687,46 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     }
+    function createNoteCard(note) {
+        return `
+            <div class="note-card" data-id="${note.id}">
+                <div class="note-card-header">
+                    <h5>${note.title}</h5>
+                    <div>
+                        <button class="btn btn-sm btn-info btn-edit-note" title="Edit"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-danger btn-delete-note" title="Hapus"><i class="bi bi-trash"></i></button>
+                    </div>
+                </div>
+                <div class="note-card-body">
+                    <p>${note.content.substring(0, 100)}${note.content.length > 100 ? '...' : ''}</p>
+                </div>
+                <div class="note-card-footer">
+                    <small>${new Date(note.updated_at).toLocaleString('id-ID')}</small>
+                </div>
+            </div>
+        `;
+    }
+    
+    // --- FUNGSI UNTUK MENGHASILKAN EVENT DI KALENDER ---
     function getCalendarEvents(dateStr, dayName) {
         let html = '';
+        // Logika lama untuk jadwal (tidak berubah)
         state.schedules.filter(s => s.day_of_week === dayName).forEach(item => {
             const course = state.courses.find(c => c.id === item.course_id);
             if (course) {
-                html += `<div class="calendar-event" title="${course.nama}">${item.start_time} ${course.nama}</div>`;
+                html += `<div class="calendar-event" data-course-id="${course.id}" title="${course.nama}">${item.start_time} ${course.nama}</div>`;
             }
         });
+
+        // TAMBAHKAN: Logika untuk menampilkan catatan berdasarkan note_date
+        state.notes.filter(note => note.note_date === dateStr).forEach(note => {
+            html += `<div class="calendar-note" data-note-id="${note.id}" title="Catatan: ${note.title}">${note.title}</div>`;
+        });
+
         return html;
     }
 
     // --- START THE APP ---
     init();
+
 });
