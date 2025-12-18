@@ -112,7 +112,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 <div class="invalid-feedback"><?php echo $confirm_password_err; ?></div>
                             </div>
                             <div class="d-grid">
-                                <input type="submit" class="btn btn-success" value="Daftar">
+                                <input type="submit" class="btn btn-primary" value="Daftar">
                             </div>
                         </form>
                         <hr>
