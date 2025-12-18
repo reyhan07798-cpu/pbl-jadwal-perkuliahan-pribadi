@@ -397,7 +397,10 @@
             <div class="nav-links">
                 <a href="#">Beranda</a>
                 <a href="#kontak">Kontak Kami</a>
-                <a href="#"><button class="btn-login">Login</button></a>
+                <a href="login_mahasiswa.php">
+                  <button class="btn-login">Login</button>
+                </a>
+
             </div>
         </nav>
     </header>
