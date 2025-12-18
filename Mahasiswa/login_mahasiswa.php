@@ -1,10 +1,13 @@
 <?php
-// Memulai session
 session_start();
 require_once "../koneksi.php";
 
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-    header("location: jadwal.php");
+    if ($_SESSION['role'] == 'admin') {
+        header("location: ../admin/dasboard.php");
+    } else {
+        header("location: jadwal.php");
+    }
     exit;
 }
 
@@ -23,7 +26,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $password = trim($_POST["password"]);
     }
     if(empty($username_err) && empty($password_err)){
-        // Memastikan query mencocokkan dengan struktur database
         $sql = "SELECT id, username, password, role FROM users WHERE username = ?";
         
         if($stmt = $conn->prepare($sql)){
@@ -34,25 +36,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 $stmt->store_result();
                 
                 if($stmt->num_rows == 1){
-                    // Mengikat hasil ke variabel
                     $stmt->bind_result($id, $username_db, $hashed_password, $role);
                     
                     if($stmt->fetch()){
-                        // Memeriksa apakah password ada di database
                         if(!empty($hashed_password)){
-                            // Verifikasi password
                             if(password_verify($password, $hashed_password)){
                                 session_regenerate_id();
                                 $_SESSION["loggedin"] = true;
                                 $_SESSION["id"] = $id;
                                 $_SESSION["username"] = $username_db;
                                 $_SESSION["role"] = $role;
-                                header("location: jadwal.php");
+                    
+
+                                if ($_SESSION['role'] == 'admin') {
+                                    header("location: ../admin/dasboard.php");
+                                } else {
+                                    header("location: jadwal.php");
+                                }
+                                exit;
+
                             } else{
                                 $login_err = "Username atau password tidak valid.";
                             }
                         } else {
-                            // Jika password kosong di database
                             $login_err = "Terjadi kesalahan dengan akun Anda. Silakan hubungi administrator.";
                         }
                     }
@@ -73,7 +79,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Mahasiswa</title>
+    <title>Login Aplikasi Jadwal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../Css/login_mahasiswa.css">
 </head>
@@ -83,7 +89,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <div class="col-md-6 col-lg-4">
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
-                        <h2 class="card-title text-center mb-4">Login Mahasiswa</h2>
+                        <h2 class="card-title text-center mb-4">Login</h2>
                         <p class="text-center text-muted mb-4">Silakan masukkan username dan password.</p>
                         <?php if(!empty($login_err)){ echo '<div class="alert alert-danger" role="alert">' . $login_err . '</div>'; } ?>
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
