@@ -2,7 +2,6 @@
 require_once 'config/koneksi.php';
 
 // --- LOGIKA: MENGAMBIL DATA DARI DATABASE ---
-// (Tidak ada perubahan di bagian ini)
  $stmt_users = $conn->prepare("SELECT COUNT(*) FROM users");
  $stmt_users->execute();
  $total_users = $stmt_users->get_result()->fetch_row()[0];
@@ -34,7 +33,7 @@ while($row = $schedule_data->fetch_assoc()){
 
  $conn->close();
 
-// Set page title
+// Set page title dan panggil header/sidebar
  $page_title = 'Dashboard';
 require_once 'includes/header.php';
 require_once 'includes/sidebar.php';
@@ -42,14 +41,12 @@ require_once 'includes/sidebar.php';
 
 <!-- Konten Utama -->
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main">
-    <!-- Judul Halaman -->
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Dashboard</h1>
     </div>
 
     <!-- Kartu Statistik -->
     <div class="row">
-        <!-- ... (Kode kartu statistik tetap sama di sini) ... -->
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
@@ -58,9 +55,7 @@ require_once 'includes/sidebar.php';
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Pengguna</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_users; ?></div>
                         </div>
-                        <div class="col-auto">
-                            <i class="bi bi-people-fill fa-2x text-gray-300"></i>
-                        </div>
+                        <div class="col-auto"><i class="bi bi-people-fill fa-2x text-gray-300"></i></div>
                     </div>
                 </div>
             </div>
@@ -73,9 +68,7 @@ require_once 'includes/sidebar.php';
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Mata Kuliah</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_courses; ?></div>
                         </div>
-                        <div class="col-auto">
-                            <i class="bi bi-book-fill fa-2x text-gray-300"></i>
-                        </div>
+                        <div class="col-auto"><i class="bi bi-book-fill fa-2x text-gray-300"></i></div>
                     </div>
                 </div>
             </div>
@@ -88,9 +81,7 @@ require_once 'includes/sidebar.php';
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Jadwal</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_schedules; ?></div>
                         </div>
-                        <div class="col-auto">
-                            <i class="bi bi-calendar-week-fill fa-2x text-gray-300"></i>
-                        </div>
+                        <div class="col-auto"><i class="bi bi-calendar-week-fill fa-2x text-gray-300"></i></div>
                     </div>
                 </div>
             </div>
@@ -103,9 +94,7 @@ require_once 'includes/sidebar.php';
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Total Catatan</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $total_notes; ?></div>
                         </div>
-                        <div class="col-auto">
-                            <i class="bi bi-sticky-fill fa-2x text-gray-300"></i>
-                        </div>
+                        <div class="col-auto"><i class="bi bi-sticky-fill fa-2x text-gray-300"></i></div>
                     </div>
                 </div>
             </div>
@@ -114,22 +103,15 @@ require_once 'includes/sidebar.php';
 
     <!-- Grafik dan Aktivitas Terkini -->
     <div class="row">
-        <!-- ... (Kode grafik dan aktivitas tetap sama di sini) ... -->
         <div class="col-lg-8 mb-4">
             <div class="card shadow">
-                <div class="card-header">
-                    <h6 class="m-0 font-weight-bold text-primary">Distribusi Jadwal per Hari</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="scheduleChart"></canvas>
-                </div>
+                <div class="card-header"><h6 class="m-0 font-weight-bold text-primary">Distribusi Jadwal per Hari</h6></div>
+                <div class="card-body"><canvas id="scheduleChart"></canvas></div>
             </div>
         </div>
         <div class="col-lg-4 mb-4">
             <div class="card shadow">
-                <div class="card-header">
-                    <h6 class="m-0 font-weight-bold text-primary">Aktivitas Terkini</h6>
-                </div>
+                <div class="card-header"><h6 class="m-0 font-weight-bold text-primary">Aktivitas Terkini</h6></div>
                 <div class="card-body">
                     <?php if ($result_activity->num_rows > 0): ?>
                         <div class="list-group list-group-flush">
@@ -154,11 +136,10 @@ require_once 'includes/sidebar.php';
 </div> <!-- Penutup .container-fluid dari header -->
 
 <!-- Bootstrap 5 JS Bundle (Lokal) -->
-<script src="assets/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Script untuk membuat grafik
     const ctx = document.getElementById('scheduleChart').getContext('2d');
     const scheduleChart = new Chart(ctx, {
         type: 'bar',
@@ -174,14 +155,7 @@ require_once 'includes/sidebar.php';
         },
         options: {
             responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
         }
     });
 </script>

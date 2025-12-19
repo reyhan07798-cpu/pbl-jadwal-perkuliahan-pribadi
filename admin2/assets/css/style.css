@@ -2,13 +2,6 @@
 :root {
   --bs-primary: #5a8787;
   --bs-primary-rgb: 90, 135, 135;
-  --bs-secondary: #6c757d;
-  --bs-success: #198754;
-  --bs-info: #0dcaf0;
-  --bs-warning: #ffc107;
-  --bs-danger: #dc3545;
-  --bs-light: #f8f9fa;
-  --bs-dark: #212529;
 }
 
 /* Gaya Tambahan untuk Dashboard */
@@ -22,14 +15,14 @@ body {
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 100; /* Di belakang navbar */
-  padding: 48px 0 0; /* Tinggi navbar */
+  z-index: 100;
+  padding: 48px 0 0;
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
 }
 
 @media (max-width: 767.98px) {
   .sidebar {
-    top: 5.5rem; /* Tinggi navbar di mobile */
+    top: 5.5rem;
   }
 }
 
@@ -39,7 +32,7 @@ body {
   height: calc(100vh - 48px);
   padding-top: .5rem;
   overflow-x: hidden;
-  overflow-y: auto; /* Scrollable konten jika terlalu panjang */
+  overflow-y: auto;
 }
 
 .sidebar .nav-link {
@@ -84,7 +77,7 @@ body {
 
 /* Gaya untuk Konten Utama */
 .main {
-  margin-left: 240px; /* Lebar sidebar */
+  margin-left: 240px;
   padding: 1rem;
 }
 

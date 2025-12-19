@@ -1,8 +1,8 @@
 <?php
  $host = 'localhost';
  $user = 'root';
- $pass = '';
- $db   = 'db_dashboard';
+ $pass = ''; // Kosongkan jika tidak ada password
+ $db   = 'db_dashboard'; // Pastikan nama database ini benar
 
  $conn = new mysqli($host, $user, $pass, $db);
 
