@@ -437,4 +437,16 @@ body {
 /* --- Utility --- */
 .w-100 { width: 100%; }
 .text-center { text-align: center; }
-.text-muted { color: var(--secondary-color); }
+.text-muted { color: var(--secondary-color); 
+}
+
+.schedule-title,
+.schedule-date {
+    text-align: center;
+}
+
+.schedule-date {
+    font-weight: 500;
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+}
