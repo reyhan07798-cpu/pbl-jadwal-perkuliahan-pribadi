@@ -69,17 +69,15 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
                         </div>
                     </aside>
                     <div class="schedule-content">
-                        <div class="card">
-                            <h4>Jadwal Mingguan</h4>
-                            <p id="current-week-date"></p>
-                            <div class="table-container">
-                                <table class="schedule-table" id="schedule-table">
-                                    <!-- Tabel jadwal akan di-generate oleh JavaScript -->
-                                </table>
-                            </div>
+                      <div class="card">
+                        <h4 class="schedule-title">Jadwal Mingguan</h4>
+                        <p id="current-week-date" class="schedule-date"></p>
+                        <div class="table-container">
+                            <table class="schedule-table" id="schedule-table"></table>
                         </div>
                     </div>
                 </div>
+            </div>
             </section>
 
             <!-- Tab Kalender -->
