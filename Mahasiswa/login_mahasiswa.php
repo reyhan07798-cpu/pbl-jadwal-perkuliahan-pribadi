@@ -49,7 +49,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     
 
                                 if ($_SESSION['role'] == 'admin') {
-                                    header("location: ../admin/dasboard.php");
+                                    header("location: ../admin/beranda.php");
                                 } else {
                                     header("location: jadwal.php");
                                 }

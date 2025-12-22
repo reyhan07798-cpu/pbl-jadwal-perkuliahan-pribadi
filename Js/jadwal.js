@@ -1,7 +1,7 @@
 /**
- * @fileoverview Manages the entire student schedule application UI and logic.
+ * @fileoverview Manages entire student schedule application UI and logic.
  * Handles course scheduling, calendar view, notes with dates, and data synchronization with a server.
- * @version 8.4 - Notes with Dates and Full Calendar Integration
+ * @version 8.5 - Added PDF Export and Independent Scrolling
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -48,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
         datetimeDay: document.getElementById('datetime-day'),
         datetimeDate: document.getElementById('datetime-date'),
         datetimeTime: document.getElementById('datetime-time'),
+        // PERUBAHAN: Tambahkan elemen tombol export PDF
+        exportPdfBtn: document.getElementById('export-pdf-btn'),
     };
 
     // --- API HANDLERS (untuk komunikasi dengan backend) ---
@@ -211,6 +213,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         elements.modalClose.addEventListener('click', hideModal);
         elements.modalContainer.addEventListener('click', (e) => { if (e.target === elements.modalContainer) hideModal(); });
+        
+        // PERUBAHAN: Tambahkan event listener untuk tombol export PDF
+        elements.exportPdfBtn.addEventListener('click', handleExportPdf);
     }
 
     // --- FUNGSI-FUNGSI RENDER UNTUK MENAMPILKAN UI ---
@@ -251,7 +256,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstDay = new Date(state.currentYear, state.currentMonth, 1).getDay();
         const daysInMonth = new Date(state.currentYear, state.currentMonth + 1, 0).getDate();
         
-        // PERBAIKAN: Gunakan Object.values() untuk mengubah DAY_MAP menjadi array
         let html = Object.values(DAY_MAP).map(day => `<div class="calendar-day-header">${day}</div>`).join('');
 
         for (let i = 0; i < firstDay; i++) html += `<div class="calendar-day other-month"></div>`;
@@ -304,13 +308,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- FUNGSI UNTUK MENANGANI KLIK PADA EVENT KALENDER (JADWAL & CATATAN) ---
     function handleCalendarEventClick(e) {
         const eventEl = e.target.closest('.calendar-event');
         const noteEl = e.target.closest('.calendar-note');
 
         if (eventEl) {
-            // Logika jika yang diklik adalah jadwal
             const courseId = parseInt(eventEl.dataset.courseId);
             const dayEl = eventEl.closest('.calendar-day');
             const dateStr = dayEl.dataset.date;
@@ -323,7 +325,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Cari catatan berdasarkan note_date yang sama dengan tanggal di kalender
             const notesForTheDay = state.notes.filter(note => note.note_date === dateStr);
 
             let modalBody = `
@@ -366,7 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         } else if (noteEl) {
-            // Logika jika yang diklik adalah catatan, tampilkan langsung modal catatan
             const noteId = parseInt(noteEl.dataset.noteId);
             viewNote(noteId);
         }
@@ -481,14 +481,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- FUNGSI UNTUK MENAMPILKAN MODAL TAMBAH CATATAN ---
     function showAddNoteModal() {
-        // Ambil tanggal hari ini untuk nilai default
         const today = new Date().toISOString().split('T')[0];
         const formHtml = `
             <form id="note-form">
                 <div class="form-group"><label>Judul Catatan</label><input type="text" class="form-control" name="note_title" required></div>
-                <!-- TAMBAHKAN: Input untuk tanggal catatan -->
                 <div class="form-group"><label>Tanggal Catatan</label><input type="date" class="form-control" name="note_date" value="${today}" required></div>
                 <div class="form-group"><label>Isi Catatan</label><textarea class="form-control" name="note_content" rows="8" required></textarea></div>
                 <button type="submit" class="btn btn-primary">Simpan Catatan</button>
@@ -508,7 +505,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const noteData = {
             title: formData.get('note_title'),
             content: formData.get('note_content'),
-            // TAMBAHKAN: Kirim note_date ke backend
             note_date: formData.get('note_date'),
         };
         
@@ -525,7 +521,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- FUNGSI UNTUK MENAMPILKAN MODAL EDIT CATATAN ---
     async function handleEditNote(noteId) {
         const note = state.notes.find(n => n.id === noteId);
         if (!note) return;
@@ -534,7 +529,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <form id="edit-note-form">
                 <input type="hidden" name="note_id" value="${note.id}">
                 <div class="form-group"><label>Judul Catatan</label><input type="text" class="form-control" name="note_title" value="${note.title}" required></div>
-                <!-- TAMBAHKAN: Input untuk tanggal catatan dengan nilai yang ada -->
                 <div class="form-group"><label>Tanggal Catatan</label><input type="date" class="form-control" name="note_date" value="${note.note_date}" required></div>
                 <div class="form-group"><label>Isi Catatan</label><textarea class="form-control" name="note_content" rows="8" required>${note.content}</textarea></div>
                 <button type="submit" class="btn btn-primary">Perbarui Catatan</button>
@@ -555,7 +549,6 @@ document.addEventListener('DOMContentLoaded', () => {
             id: parseInt(formData.get('note_id')),
             title: formData.get('note_title'),
             content: formData.get('note_content'),
-            // TAMBAHKAN: Kirim note_date ke backend
             note_date: formData.get('note_date'),
         };
         
@@ -710,7 +703,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- FUNGSI UNTUK MENGHASILKAN EVENT DI KALENDER ---
     function getCalendarEvents(dateStr, dayName) {
         let html = '';
-        // Logika lama untuk jadwal (tidak berubah)
         state.schedules.filter(s => s.day_of_week === dayName).forEach(item => {
             const course = state.courses.find(c => c.id === item.course_id);
             if (course) {
@@ -718,12 +710,53 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // TAMBAHKAN: Logika untuk menampilkan catatan berdasarkan note_date
         state.notes.filter(note => note.note_date === dateStr).forEach(note => {
             html += `<div class="calendar-note" data-note-id="${note.id}" title="Catatan: ${note.title}">${note.title}</div>`;
         });
 
         return html;
+    }
+
+    // --- PERUBAHAN: FUNGSI UNTUK EXPORT PDF ---
+    async function handleExportPdf() {
+        const originalText = elements.exportPdfBtn.innerHTML;
+        showLoading(elements.exportPdfBtn, originalText);
+
+        const exportData = {
+            courses: state.courses,
+            schedules: state.schedules
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}export_schedule_pdf.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(exportData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Gagal membuat PDF.');
+            }
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `jadwal_perkuliahan_${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(downloadUrl);
+            document.body.removeChild(a);
+
+            showToast('PDF berhasil diunduh!', 'success');
+
+        } catch (error) {
+            console.error('Export PDF Error:', error);
+            showToast(error.message, 'error');
+        } finally {
+            hideLoading(elements.exportPdfBtn, originalText);
+        }
     }
 
     // --- START THE APP ---

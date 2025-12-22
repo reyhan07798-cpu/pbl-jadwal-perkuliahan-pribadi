@@ -1,12 +1,9 @@
 <?php
-// Memulai session untuk menyimpan informasi login pengguna
 session_start();
 
-// Cek apakah user sudah login. Jika session 'loggedin' tidak ada atau bernilai false,
-// redirect pengguna kembali ke halaman login.
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: login_mahasiswa.php");
-    exit; // Hentikan eksekusi skrip
+    exit;
 }
 ?>
  
@@ -16,14 +13,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jadwal Perkuliahan Mahasiswa</title>
-    
-    <!-- Bootstrap Icons -->
-    <!-- Untuk menampilkan ikon-ikon seperti kalender, pensil, dll. -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
-    <!-- Custom CSS -->
-    <!-- File CSS utama untuk mengatur tampilan aplikasi -->
-    <!-- Path ini sudah BENAR karena Css folder berada di luar folder Mahasiswa -->
     <link rel="stylesheet" href="../Css/jadwal.css">
 </head>
 <body>
@@ -70,14 +60,22 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
                     </aside>
                     <div class="schedule-content">
                       <div class="card">
-                        <h4 class="schedule-title">Jadwal Mingguan</h4>
-                        <p id="current-week-date" class="schedule-date"></p>
+                        <!-- PERUBAHAN: Header diubah untuk menampung tombol export -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4 class="schedule-title">Jadwal Mingguan</h4>
+                                <p id="current-week-date" class="schedule-date"></p>
+                            </div>
+                            <!-- PERUBAHAN: Tombol Export PDF ditambahkan di sini -->
+                            <button id="export-pdf-btn" class="btn btn-success">
+                                <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                            </button>
+                        </div>
                         <div class="table-container">
                             <table class="schedule-table" id="schedule-table"></table>
                         </div>
                     </div>
                 </div>
-            </div>
             </section>
 
             <!-- Tab Kalender -->
@@ -123,11 +121,8 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
         </div>
     </div>
 
-    <!-- Container untuk notifikasi (toast) -->
     <div id="toast-container" class="toast-container"></div>
 
-    <!-- JavaScript -->
-    <!-- Path ini sudah BENAR karena Js folder berada di luar folder Mahasiswa -->
     <script src="../Js/jadwal.js"></script>
 </body>
 </html>
