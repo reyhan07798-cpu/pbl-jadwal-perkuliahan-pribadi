@@ -79,46 +79,42 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <meta charset="UTF-8">
     <title>Daftar Mahasiswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/resgister.css">
+    <link rel="stylesheet" href="../Css/resgister.css">
 </head>
 <body class="bg-light">
     <div class="container">
-        <div class="row justify-content-center align-items-center min-vh-100">
-            <div class="col-md-6 col-lg-5">
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
-                        <h2 class="card-title text-center mb-4">Daftar Mahasiswa</h2>
-                        <p class="text-center text-muted mb-4">Silakan isi form untuk membuat akun.</p>
-                        <?php if(!empty($register_err)){ echo '<div class="alert alert-danger" role="alert">' . $register_err . '</div>'; } ?>
-                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($username); ?>">
-                                <div class="invalid-feedback"><?php echo $username_err; ?></div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($email); ?>">
-                                <div class="invalid-feedback"><?php echo $email_err; ?></div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
-                                <div class="invalid-feedback"><?php echo $password_err; ?></div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="confirm_password" class="form-label">Konfirmasi Password</label>
-                                <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>">
-                                <div class="invalid-feedback"><?php echo $confirm_password_err; ?></div>
-                            </div>
-                            <div class="d-grid">
-                                <input type="submit" class="btn btn-primary" value="Daftar">
-                            </div>
-                        </form>
-                        <hr>
-                        <p class="text-center mb-0">Sudah punya akun? <a href="login_mahasiswa.php">Login di sini</a>.</p>
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-2">Daftar Mahasiswa</h2>
+                <p class="text-center text-muted mb-4">Silakan isi form untuk membuat akun.</p>
+                <?php if(!empty($register_err)){ echo '<div class="alert alert-danger" role="alert">' . $register_err . '</div>'; } ?>
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($username); ?>">
+                        <div class="invalid-feedback"><?php echo $username_err; ?></div>
                     </div>
-                </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($email); ?>">
+                        <div class="invalid-feedback"><?php echo $email_err; ?></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
+                        <div class="invalid-feedback"><?php echo $password_err; ?></div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label">Konfirmasi Password</label>
+                        <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>">
+                        <div class="invalid-feedback"><?php echo $confirm_password_err; ?></div>
+                    </div>
+                    <div class="d-grid">
+                        <input type="submit" class="btn btn-primary" value="Daftar">
+                    </div>
+                </form>
+                <hr>
+                <p class="text-center mb-0">Sudah punya akun? <a href="login_mahasiswa.php">Login di sini</a>.</p>
             </div>
         </div>
     </div>
