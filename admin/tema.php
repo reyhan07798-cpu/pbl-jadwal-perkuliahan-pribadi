@@ -1,10 +1,11 @@
 <?php
 session_start();
+require_once '../koneksi.php';
 require_once 'fungsi.php'; // Memuat fungsi bantu
 
 // Cek apakah user sudah login dan role-nya admin
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION['role'] !== 'admin') {
-    header('location: ../login.php');
+    header('location: ../Mahasiswa/login_mahasiswa.php');
     exit;
 }
 
