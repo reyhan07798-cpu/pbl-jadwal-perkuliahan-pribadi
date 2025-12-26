@@ -377,31 +377,58 @@
         <p>&copy; <?php echo date('Y'); ?> <?php echo $siteName; ?>. Dikembangkan oleh Tim technova.</p>
     </footer>
 
+        <!-- Letakkan ini di bagian paling bawah index.php sebelum </body> -->
     <script>
         document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Mencegah halaman refresh
             
+            // Ambil nilai input
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const message = document.getElementById('message').value;
-            
-            alert('Terima kasih ' + name + '!\n\nPesan Anda telah berhasil dikirim. Tim kami akan segera menghubungi Anda melalui email: ' + email);
-            
 
-            this.reset();
+            // Tampilkan loading (opsional)
+            const btn = this.querySelector('button[type="submit"]');
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = 'Mengirim...';
+            btn.disabled = true;
+
+            // Kirim data menggunakan Fetch API ke file kirim_pesan.php
+            fetch('kirim_pesan.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Tampilkan pesan hasil
+                if (data.success) {
+                    alert('Terima kasih, ' + name + '!\n\n' + data.message);
+                    document.getElementById('contactForm').reset(); // Kosongkan form
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan koneksi server.');
+            })
+            .finally(() => {
+                // Kembalikan tombol ke kondisi semula
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            });
         });
 
+        // Script Smooth Scroll (jika belum ada)
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                const href = this.getAttribute('href');
-                if (href !== '#' && href !== '#kontak') return;
-                
-                if (href === '#kontak') {
-                    e.preventDefault();
-                    document.querySelector(href).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
         });
     </script>

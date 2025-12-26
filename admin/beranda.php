@@ -1,26 +1,41 @@
 <?php
+// PERBAIKAN 1: Cek session agar tidak error jika sudah aktif
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once '../koneksi.php';
 require_once 'fungsi.php'; 
 
-// Cek apakah user sudah login dan role-nya admin
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION['role'] !== 'admin') {
-    header('location: ../Mahasiswa/login_mahasiswa.php');
+// PERBAIKAN 2: Redirect yang benar saat belum login
+if (
+    !isset($_SESSION['loggedin']) ||
+    $_SESSION['loggedin'] !== true ||
+    !isset($_SESSION['role']) ||
+    $_SESSION['role'] !== 'admin'
+) {
+    // Arahkan ke halaman Login, jangan ke beranda lagi
+    header('Location: ../Mahasiswa/login_mahasiswa.php');
     exit;
 }
 
-// Jika ada notifikasi toast, tampilkan lalu hapus dari session
+// ================= NOTIFIKASI TOAST =================
  $toast_script = '';
 if (isset($_SESSION['toast'])) {
-    $tipe = $_SESSION['toast']['tipe'];
+    $tipe  = $_SESSION['toast']['tipe'];
     $pesan = $_SESSION['toast']['pesan'];
-    $toast_script = "<script>document.addEventListener('DOMContentLoaded', function() { showToast('{$pesan}', '{$tipe}'); });</script>";
+    $toast_script = "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('{$pesan}', '{$tipe}');
+        });
+    </script>";
     unset($_SESSION['toast']);
 }
 
-// --- 1. LOGIKA HALAMAN ---
+// ================= LOGIKA HALAMAN =================
  $page_title = 'Beranda';
 
-// Query untuk mendapatkan statistik
+// Statistik
  $stmt_users = $conn->prepare("SELECT COUNT(*) FROM users");
  $stmt_users->execute();
  $total_users = $stmt_users->get_result()->fetch_row()[0];
@@ -37,40 +52,52 @@ if (isset($_SESSION['toast'])) {
  $stmt_notes->execute();
  $total_notes = $stmt_notes->get_result()->fetch_row()[0];
 
-// --- PERUBAHAN: Query untuk statistik pesan ---
  $stmt_messages = $conn->prepare("SELECT COUNT(*) FROM contact_messages");
  $stmt_messages->execute();
  $total_messages = $stmt_messages->get_result()->fetch_row()[0];
 
-// --- PERUBAHAN: Query untuk pesan belum dibaca ---
- $stmt_unread = $conn->prepare("SELECT COUNT(*) FROM contact_messages WHERE status = 'unread'");
+ $stmt_unread = $conn->prepare("SELECT COUNT(*) FROM contact_messages WHERE status='unread'");
  $stmt_unread->execute();
  $total_unread = $stmt_unread->get_result()->fetch_row()[0];
 
-
-// Query untuk aktivitas terkini (pengguna baru)
- $recent_users = $conn->prepare("SELECT username, created_at FROM users ORDER BY created_at DESC LIMIT 5");
+// Aktivitas User
+ $recent_users = $conn->prepare("
+    SELECT username, created_at 
+    FROM users 
+    ORDER BY created_at DESC 
+    LIMIT 5
+");
  $recent_users->execute();
  $result_users = $recent_users->get_result();
 
-// --- PERUBAHAN: Query untuk pesan terbaru ---
- $recent_messages = $conn->prepare("SELECT name, message, created_at FROM contact_messages ORDER BY created_at DESC LIMIT 5");
+// PERBAIKAN 3: Query Pesan (INI YANG PENTING)
+// Kita TAMBAHKAN 'id', 'email', dan 'status' agar tidak error Undefined array key
+ $recent_messages = $conn->prepare("
+    SELECT id, name, email, message, status, created_at 
+    FROM contact_messages 
+    ORDER BY created_at DESC 
+    LIMIT 5
+");
  $recent_messages->execute();
  $result_messages = $recent_messages->get_result();
 
-// --- PERUBAHAN: Query data untuk grafik jadwal per hari ---
- $schedule_data = $conn->query("SELECT day_of_week, COUNT(*) as count FROM schedules GROUP BY day_of_week ORDER BY FIELD(day_of_week, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat')");
+// Grafik
+ $schedule_data = $conn->query("
+    SELECT day_of_week, COUNT(*) AS count 
+    FROM schedules 
+    GROUP BY day_of_week
+");
 
  $labels = [];
  $data = [];
-while($row = $schedule_data->fetch_assoc()){
-    $labels[] = $row['day_of_week']; 
-    $data[] = $row['count'];
+while ($row = $schedule_data->fetch_assoc()) {
+    $labels[] = $row['day_of_week'];
+    $data[]   = $row['count'];
 }
 
  $conn->close();
 
-// --- 2. SIMPAN ISI HALAMAN KE VARIABEL ---
+// ================= BUFFER KONTEN =================
 ob_start();
 ?>
 
@@ -137,7 +164,7 @@ ob_start();
             </div>
         </div>
     </div>
-    <!-- --- PERUBAHAN: Kartu Statistik Pesan --- -->
+    <!-- --- Kartu Statistik Pesan --- -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-danger shadow h-100 py-2">
             <div class="card-body">
@@ -203,7 +230,7 @@ ob_start();
             </div>
         </div>
     </div>
-    <!-- --- PERUBAHAN: Aktivitas Terkini Pesan --- -->
+    <!-- --- Aktivitas Terkini Pesan --- -->
     <div class="col-lg-12 mb-4">
         <div class="card shadow">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
@@ -218,7 +245,8 @@ ob_start();
                                 <div class="d-flex w-100 justify-content-between">
                                     <div class="me-3">
                                         <div class="fw-bold"><?php echo htmlspecialchars($message['name']); ?></div>
-                                        <small class="text-muted"><?php echo htmlspecialchars($message['email']); ?></small>
+                                        <!-- Menampilkan Email -->
+                                        <small class="text-muted"><?php echo htmlspecialchars($message['email'] ?? '-'); ?></small>
                                     </div>
                                     <div>
                                         <?php 
@@ -232,9 +260,11 @@ ob_start();
                                     <small class="text-muted"><?php echo date('d M Y, H:i', strtotime($message['created_at'])); ?></small>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <span class="badge bg-<?php echo $message['status'] == 'unread' ? 'danger' : 'secondary'; ?> me-2">
-                                        <?php echo $message['status'] == 'unread' ? 'Baru' : 'Dibaca'; ?>
+                                    <!-- Menampilkan Status Badge -->
+                                    <span class="badge bg-<?php echo ($message['status'] ?? 'read') == 'unread' ? 'danger' : 'secondary'; ?> me-2">
+                                        <?php echo ($message['status'] ?? 'read') == 'unread' ? 'Baru' : 'Dibaca'; ?>
                                     </span>
+                                    <!-- Tombol Tandai & Hapus (ID dipastikan ada) -->
                                     <a href="pesan_masuk.php?mark_read=<?php echo $message['id']; ?>" class="btn btn-sm btn-info me-1">Tandai</a>
                                     <a href="pesan_masuk.php?delete=<?php echo $message['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus pesan ini?')">Hapus</a>
                                 </div>
@@ -277,9 +307,6 @@ ob_start();
 </script>
 
 <?php
-// --- 3. TUTUP BUFFER DAN SIMPAN KE VARIABEL ---
  $page_content = ob_get_clean();
-
-// --- 4. PANGGIL TEMPLATE ---
 require_once 'tema.php';
 ?>

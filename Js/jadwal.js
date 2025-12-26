@@ -1,14 +1,14 @@
 /**
  * @fileoverview Manages entire student schedule application UI and logic.
  * Handles course scheduling, calendar view, notes with dates, and data synchronization with a server.
- * @version 8.5 - Added PDF Export and Independent Scrolling
+ * @version 9.0 - Final Fix for Edit Sequence & Room Handling
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
     // --- KONFIGURASI & STATE GLOBAL ---
-    const API_BASE_URL = './api/';
+    const API_BASE_URL = '../Mahasiswa/api/'; // Sesuaikan path jika perlu
 
     const state = {
         courses: [],
@@ -48,11 +48,11 @@ document.addEventListener('DOMContentLoaded', () => {
         datetimeDay: document.getElementById('datetime-day'),
         datetimeDate: document.getElementById('datetime-date'),
         datetimeTime: document.getElementById('datetime-time'),
-        // PERUBAHAN: Tambahkan elemen tombol export PDF
+        // Tombol Export PDF
         exportPdfBtn: document.getElementById('export-pdf-btn'),
     };
 
-    // --- API HANDLERS (untuk komunikasi dengan backend) ---
+    // --- API HANDLERS ---
     const api = {
         async fetchSchedule() {
             const cacheBuster = new Date().getTime();
@@ -148,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- INISIALISASI APLIKASI ---
     function init() {
         setupEventListeners();
         initializeUI();
@@ -161,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCurrentWeekDate();
     }
 
-    // --- MANAJEMEN DATA ---
     async function loadData() {
         try {
             const [schedulesData, notesData] = await Promise.all([
@@ -193,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- PEMROSES EVENT (EVENT LISTENERS) ---
     function setupEventListeners() {
         elements.navBtns.forEach(btn => btn.addEventListener('click', () => switchTab(btn.dataset.tab)));
         elements.addCourseBtn.addEventListener('click', showAddCourseModal);
@@ -208,17 +205,14 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.addNoteBtn.addEventListener('click', showAddNoteModal);
         elements.notesGrid.addEventListener('click', handleNotesClick);
 
-        // Event listener untuk interaksi kalender (jadwal dan catatan)
         elements.calendarGrid.addEventListener('click', handleCalendarEventClick);
 
         elements.modalClose.addEventListener('click', hideModal);
         elements.modalContainer.addEventListener('click', (e) => { if (e.target === elements.modalContainer) hideModal(); });
         
-        // PERUBAHAN: Tambahkan event listener untuk tombol export PDF
         elements.exportPdfBtn.addEventListener('click', handleExportPdf);
     }
 
-    // --- FUNGSI-FUNGSI RENDER UNTUK MENAMPILKAN UI ---
     function renderAll() {
         renderScheduleTable();
         renderCourseList();
@@ -280,7 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.notesGrid.innerHTML = state.notes.map(note => createNoteCard(note)).join('');
     }
 
-    // --- HANDLER UNTUK INTERAKSI PENGGUNA ---
     function handleScheduleClick(e) {
         const classCard = e.target.closest('.class-card');
         if (classCard) {
@@ -382,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const courseData = {
             course_name: formData.get('course_name'), sks: formData.get('sks'), dosen: formData.get('dosen'),
             day_of_week: formData.get('hari'), start_time: formData.get('jamMulai'),
-            end_time: formData.get('jamSelesai'), room: formData.get('ruangan'),
+            end_time: formData.get('jamSelesai'), room: formData.get('room'),
         };
         
         try {
@@ -400,14 +393,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleEditSchedule(courseId) {
         try {
+            // PERBAIKAN PENTING: Selalu ambil FRESH data dari database
             const courseData = await api.getCourseById(courseId);
+            
+            // Escape HTML untuk mencegah error jika ada tanda kutip di nama ruangan
+            const safeRoom = (courseData.room || '').replace(/"/g, '&quot;');
+            
             const formHtml = `
                 <form id="edit-course-form">
                     <input type="hidden" name="course_id" value="${courseData.id}">
                     <div class="form-group"><label>Nama MK</label><input type="text" class="form-control" name="course_name" value="${courseData.course_name}" required></div>
                     <div class="form-group"><label>SKS</label><input type="number" class="form-control" name="sks" value="${courseData.sks}" required></div>
                     <div class="form-group"><label>Dosen</label><input type="text" class="form-control" name="dosen" value="${courseData.dosen}" required></div>
-                    <div class="form-group"><label>Ruangan</label><input type="text" class="form-control" name="room" value="${courseData.room}" required></div>
+                    <div class="form-group"><label>Ruangan</label><input type="text" class="form-control" name="room" value="${safeRoom}" required></div>
                     <div class="form-group"><label>Hari</label><select class="form-control" name="hari" required>${DAYS.map(d => `<option value="${d}" ${courseData.day_of_week === d ? 'selected' : ''}>${d}</option>`).join('')}</select></div>
                     <div class="form-group"><label>Jam Mulai</label><input type="time" class="form-control" name="jamMulai" value="${courseData.start_time || ''}" required></div>
                     <div class="form-group"><label>Jam Selesai</label><input type="time" class="form-control" name="jamSelesai" value="${courseData.end_time || ''}" required></div>
@@ -415,6 +413,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 </form>
             `;
             showModal(`Edit Mata Kuliah: ${courseData.course_name}`, formHtml);
+            
+            // PERBAIKAN PENTING: Bersihkan event lama sebelum pasang baru
+            const form = document.getElementById('edit-course-form');
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+
             document.getElementById('edit-course-form').addEventListener('submit', handleUpdateSchedule);
         } catch (error) {
             console.error('Error di handleEditSchedule:', error);
@@ -429,17 +433,28 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoading(submitBtn, originalText);
 
         const formData = new FormData(e.target);
+        
         const courseData = {
-            course_id: formData.get('course_id'),
-            course_name: formData.get('course_name'), sks: formData.get('sks'), dosen: formData.get('dosen'),
-            day_of_week: formData.get('hari'), start_time: formData.get('jamMulai'),
-            end_time: formData.get('jamSelesai'), room: formData.get('ruangan'),
+            id: parseInt(formData.get('course_id')),
+            course_name: formData.get('course_name'), 
+            sks: formData.get('sks'), 
+            dosen: formData.get('dosen'),
+            day_of_week: formData.get('hari'), 
+            start_time: formData.get('jamMulai'),
+            end_time: formData.get('jamSelesai'), 
+            room: formData.get('room'), 
         };
+
+        // Debugging
+        console.log("Data yang dikirim:", courseData);
 
         try {
             const result = await api.updateCourseAndSchedule(courseData);
             showToast(result.message, 'success');
-            await loadData();
+            
+            // PERBAIKAN KRUSIAL: Refresh data dari database agar edit kedua berhasil
+            await loadData(); 
+            
         } catch (error) {
             console.error('Error updating course:', error);
             showToast(error.message, 'error');
@@ -447,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hideLoading(submitBtn, originalText);
             hideModal();
         }
-    }
+    }    
 
     async function handleDeleteSchedule(courseId) {
         const course = state.courses.find(c => c.id === courseId);
@@ -464,7 +479,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- HANDLER UNTUK NOTES ---
     function handleNotesClick(e) {
         const noteCard = e.target.closest('.note-card');
         if (!noteCard) return;
@@ -535,6 +549,12 @@ document.addEventListener('DOMContentLoaded', () => {
             </form>
         `;
         showModal(`Edit Catatan: ${note.title}`, formHtml);
+        
+        // Fix duplicate listener
+        const form = document.getElementById('edit-note-form');
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
         document.getElementById('edit-note-form').addEventListener('submit', handleUpdateNote);
     }
 
@@ -576,7 +596,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- FUNGSI BANTUAN UI (UI HELPERS) ---
     const debounce = (func, delay) => { let timeoutId; return (...args) => { clearTimeout(timeoutId); timeoutId = setTimeout(() => func.apply(this, args), delay); }; };
     const showLoading = (button, originalText) => { button.disabled = true; button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...`; };
     const hideLoading = (button, originalText) => { button.disabled = false; button.innerHTML = originalText; };
@@ -616,7 +635,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderCalendar();
     }
 
-    // --- FUNGSI UNTUK MENAMPILKAN DETAIL DAN MODAL ---
     function viewCourse(id) {
         const course = state.courses.find(c => c.id === id);
         if (!course) return;
@@ -644,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="form-group"><label>Nama MK</label><input type="text" class="form-control" name="course_name" required></div>
                 <div class="form-group"><label>SKS</label><input type="number" class="form-control" name="sks" required></div>
                 <div class="form-group"><label>Dosen</label><input type="text" class="form-control" name="dosen" required></div>
-                <div class="form-group"><label>Ruangan</label><input type="text" class="form-control" name="ruangan" required></div>
+                <div class="form-group"><label>Ruangan</label><input type="text" class="form-control" name="room" required></div>
                 <div class="form-group"><label>Hari</label><select class="form-control" name="hari" required>${DAYS.map(d => `<option value="${d}">${d}</option>`).join('')}</select></div>
                 <div class="form-group"><label>Jam Mulai</label><input type="time" class="form-control" name="jamMulai" required></div>
                 <div class="form-group"><label>Jam Selesai</label><input type="time" class="form-control" name="jamSelesai" required></div>
@@ -652,10 +670,15 @@ document.addEventListener('DOMContentLoaded', () => {
             </form>
         `;
         showModal('Tambah Mata Kuliah', formHtml);
+        
+        // Fix duplicate listener
+        const form = document.getElementById('course-form');
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+
         document.getElementById('course-form').addEventListener('submit', handleAddCourse);
     }
 
-    // --- HTML TEMPLATES ---
     function createClassCard(course, scheduleItem) {
         return `
             <div class="class-card" data-id="${course.id}">
@@ -700,7 +723,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
     
-    // --- FUNGSI UNTUK MENGHASILKAN EVENT DI KALENDER ---
     function getCalendarEvents(dateStr, dayName) {
         let html = '';
         state.schedules.filter(s => s.day_of_week === dayName).forEach(item => {
@@ -717,7 +739,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return html;
     }
 
-    // --- PERUBAHAN: FUNGSI UNTUK EXPORT PDF ---
     async function handleExportPdf() {
         const originalText = elements.exportPdfBtn.innerHTML;
         showLoading(elements.exportPdfBtn, originalText);

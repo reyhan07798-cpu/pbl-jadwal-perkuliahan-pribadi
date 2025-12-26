@@ -1,45 +1,66 @@
 <?php
+// File: admin/pesan_masuk.php
+
+// 1. Start Session (Aman untuk dipanggil berkali-kali)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 2. Koneksi Database
 require_once '../koneksi.php';
-require_once 'fungsi.php';
 
-// Cek login admin
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || $_SESSION['role'] !== 'admin') {
-    header('location: ../Mahasiswa/login_mahasiswa.php');
+// 3. Cek Keamanan (Harus Admin)
+if (
+    !isset($_SESSION['loggedin']) ||
+    $_SESSION['loggedin'] !== true ||
+    $_SESSION['role'] !== 'admin'
+) {
+    header('Location: ../Mahasiswa/login_mahasiswa.php');
     exit;
 }
 
- $page_title = 'Pesan Masuk';
+ $page_title = "Pesan Masuk";
 
-// Proses tandai dibaca
-if (isset($_GET['action']) && $_GET['action'] == 'mark_read' && isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $stmt = $conn->prepare("UPDATE contact_messages SET status = 'read' WHERE id = ?");
-    $stmt->bind_param("i", $id);
+// --- LOGIKA AKSI (Tandai Baca, Hapus, Tandai Semua) ---
+
+// Tandai 1 pesan sudah dibaca
+if (isset($_GET['action']) && $_GET['action'] === 'mark_read' && isset($_GET['id'])) {
+    $stmt = $conn->prepare("UPDATE contact_messages SET status='read' WHERE id=?");
+    $stmt->bind_param("i", $_GET['id']);
     $stmt->execute();
+    header("Location: pesan_masuk.php"); // Refresh halaman
+    exit;
+}
+
+// Hapus 1 pesan
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $stmt = $conn->prepare("DELETE FROM contact_messages WHERE id=?");
+    $stmt->bind_param("i", $_GET['id']);
+    $stmt->execute();
+    header("Location: pesan_masuk.php"); // Refresh halaman
+    exit;
+}
+
+// Tandai semua sudah dibaca (Dijalankan jika URL ada ?action=mark_all_read)
+if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
+    $conn->query("UPDATE contact_messages SET status='read'");
     header("Location: pesan_masuk.php");
     exit;
 }
 
-// Proses hapus pesan
-if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $stmt = $conn->prepare("DELETE FROM contact_messages WHERE id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    header("Location: pesan_masuk.php");
-    exit;
-}
+// --- AMBIL DATA ---
 
 // Ambil semua pesan
- $stmt = $conn->prepare("
-    SELECT id, name, email, message, status, created_at 
-    FROM contact_messages 
-    ORDER BY created_at DESC
-");
- $stmt->execute();
- $messages = $stmt->get_result();
+ $messages = $conn->query("SELECT * FROM contact_messages ORDER BY created_at DESC");
 
- $conn->close();
+// Ambil Statistik
+ $total_msg = $messages->num_rows; // Total baris saat ini
+// Hitung unread
+ $stmt_unread = $conn->prepare("SELECT COUNT(*) FROM contact_messages WHERE status='unread'");
+ $stmt_unread->execute();
+ $unread_count = $stmt_unread->get_result()->fetch_row()[0];
+// Hitung read
+ $read_count = $total_msg - $unread_count;
 ?>
 
 <!DOCTYPE html>
@@ -47,250 +68,115 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $page_title; ?> - Admin Panel</title>
+    <title><?php echo $page_title; ?></title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        .message-card {
-            transition: all 0.3s ease;
-            border-left: 4px solid #dee2e6;
-        }
-        
-        .message-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .message-card.unread {
-            border-left-color: #0d6efd;
-            background-color: #f8f9fa;
-        }
-        
-        .message-content {
-            max-height: 100px;
-            overflow-y: auto;
-        }
-        
-        .btn-action {
-            transition: all 0.2s ease;
-        }
-        
-        .btn-action:hover {
-            transform: scale(1.05);
-        }
-        
-        .status-badge {
-            font-size: 0.75rem;
-        }
-        
-        .empty-state {
-            padding: 3rem;
-            text-align: center;
-            color: #6c757d;
-        }
-        
-        .stats-card {
-            transition: all 0.3s ease;
-        }
-        
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
+        body { background-color: #f8f9fa; }
+        .sidebar { min-height: 100vh; box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1); }
+        .message-card { transition: all 0.2s; cursor: pointer; }
+        .message-card.unread { background-color: #f0f7ff; border-left: 4px solid #0d6efd; font-weight: 500; }
+        .message-card.read { background-color: #fff; border-left: 4px solid transparent; }
+        .message-card:hover { background-color: #e9ecef; }
+        .avatar { width: 40px; height: 40px; background: #e9ecef; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #6c757d; }
     </style>
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-                <div class="position-sticky pt-3">
-                    <h5 class="sidebar-heading">Admin Panel</h5>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="index.php">
-                                <i class="bi bi-speedometer2"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="pesan_masuk.php">
-                                <i class="bi bi-envelope"></i> Pesan Masuk
-                                <?php
-                                // Hitung pesan belum dibaca
-                                $unread_count = $conn->prepare("SELECT COUNT(*) FROM contact_messages WHERE status = 'unread'");
-                                $unread_count->execute();
-                                $unread = $unread_count->get_result()->fetch_row()[0];
-                                if ($unread > 0) {
-                                    echo '<span class="badge bg-danger ms-2">' . $unread . '</span>';
-                                }
-                                ?>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="kelola_pengguna.php">
-                                <i class="bi bi-people"></i> Kelola Pengguna
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="kelola_matakuliah.php">
-                                <i class="bi bi-book"></i> Kelola Mata Kuliah
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="kelola_jadwal.php">
-                                <i class="bi bi-calendar-week"></i> Kelola Jadwal
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="kelola_catatan.php">
-                                <i class="bi bi-sticky"></i> Kelola Catatan
-                            </a>
-                        </li>
-                    </ul>
-                    <hr>
-                    <div class="dropdown">
-                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle"></i>
-                            <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                            <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                        </ul>
-                    </div>
-                </div>
+            <nav class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse p-3">
+                <h5 class="text-primary mb-4">Admin Panel</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item mb-2"><a class="nav-link" href="beranda.php"><i class="bi bi-speedometer2"></i> Beranda</a></li>
+                    <li class="nav-item mb-2"><a class="nav-link active bg-light text-primary rounded" href="pesan_masuk.php">
+                        <i class="bi bi-envelope"></i> Pesan Masuk 
+                        <?php if($unread_count > 0) echo '<span class="badge bg-danger ms-1">'.$unread_count.'</span>'; ?>
+                    </a></li>
+                    <li class="nav-item mb-2"><a class="nav-link" href="kelola_pengguna.php"><i class="bi bi-people"></i> Pengguna</a></li>
+                    <li class="nav-item mb-2"><a class="nav-link text-danger" href="keluar.php"><i class="bi bi-box-arrow-right"></i> Keluar</a></li>
+                </ul>
             </nav>
 
             <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
                     <h1 class="h2"><?php echo $page_title; ?></h1>
-                    <div class="btn-group mb-2 mb-md-0">
-                        <a href="?action=mark_all_read" class="btn btn-outline-success btn-sm">
-                            <i class="bi bi-check-all"></i> Tandai Semua Dibaca
-                        </a>
-                        <button class="btn btn-outline-primary btn-sm" onclick="location.reload()">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh
-                        </button>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <a href="?action=mark_all_read" class="btn btn-sm btn-outline-secondary" onclick="return confirm('Tandai semua pesan sudah dibaca?')">
+                                <i class="bi bi-check-all"></i> Tandai Semua Dibaca
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Stats Cards -->
+                <!-- Stats -->
                 <div class="row mb-4">
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stats-card border-left-primary shadow h-100 py-2">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-primary mb-3">
                             <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Pesan</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $messages->num_rows; ?></div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="bi bi-envelope fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
+                                <h5 class="card-title">Total Pesan</h5>
+                                <p class="card-text fs-2 fw-bold"><?php echo $total_msg; ?></p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stats-card border-left-success shadow h-100 py-2">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-danger mb-3">
                             <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Sudah Dibaca</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                            <?php 
-                                            $read_count = $conn->prepare("SELECT COUNT(*) FROM contact_messages WHERE status = 'read'");
-                                            $read_count->execute();
-                                            echo $read_count->get_result()->fetch_row()[0];
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="bi bi-envelope-open fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
+                                <h5 class="card-title">Belum Dibaca</h5>
+                                <p class="card-text fs-2 fw-bold"><?php echo $unread_count; ?></p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stats-card border-left-warning shadow h-100 py-2">
+                    <div class="col-md-4">
+                        <div class="card text-white bg-success mb-3">
                             <div class="card-body">
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col mr-2">
-                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Belum Dibaca</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                            <?php 
-                                            $unread_count = $conn->prepare("SELECT COUNT(*) FROM contact_messages WHERE status = 'unread'");
-                                            $unread_count->execute();
-                                            echo $unread_count->get_result()->fetch_row()[0];
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <i class="bi bi-envelope fa-2x text-gray-300"></i>
-                                    </div>
-                                </div>
+                                <h5 class="card-title">Sudah Dibaca</h5>
+                                <p class="card-text fs-2 fw-bold"><?php echo $read_count; ?></p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Messages List -->
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Daftar Pesan Masuk</h6>
-                    </div>
-                    <div class="card-body">
+                <!-- List Pesan -->
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
                         <?php if ($messages->num_rows > 0): ?>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Status</th>
-                                            <th>Nama</th>
-                                            <th>Email</th>
-                                            <th>Pesan</th>
-                                            <th>Waktu</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php while($message = $messages->fetch_assoc()): ?>
-                                            <tr class="message-card <?php echo $message['status'] == 'unread' ? 'unread' : ''; ?>">
-                                                <td>
-                                                    <span class="badge status-badge bg-<?php echo $message['status'] == 'unread' ? 'danger' : 'secondary'; ?>">
-                                                        <?php echo $message['status'] == 'unread' ? 'Baru' : 'Dibaca'; ?>
-                                                    </span>
-                                                </td>
-                                                <td><?php echo htmlspecialchars($message['name']); ?></td>
-                                                <td><?php echo htmlspecialchars($message['email']); ?></td>
-                                                <td>
-                                                    <div class="message-content">
-                                                        <?php echo nl2br(htmlspecialchars(substr($message['message'], 0, 100))); ?>
-                                                        <?php echo strlen($message['message']) > 100 ? '...' : ''; ?>
-                                                    </div>
-                                                </td>
-                                                <td><?php echo date('d M Y, H:i', strtotime($message['created_at'])); ?></td>
-                                                <td>
-                                                    <?php if ($message['status'] == 'unread'): ?>
-                                                        <a href="?action=mark_read&id=<?php echo $message['id']; ?>" class="btn btn-sm btn-success btn-action">
-                                                            <i class="bi bi-envelope-open"></i>
-                                                        </a>
-                                                    <?php endif; ?>
-                                                    <a href="?action=delete&id=<?php echo $message['id']; ?>" class="btn btn-sm btn-danger btn-action" onclick="return confirm('Yakin ingin menghapus pesan ini?')">
-                                                        <i class="bi bi-trash"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        <?php endwhile; ?>
-                                    </tbody>
-                                </table>
+                            <div class="list-group list-group-flush">
+                                <?php while($msg = $messages->fetch_assoc()): ?>
+                                    <div class="list-group-item message-card <?php echo $msg['status'] == 'unread' ? 'unread' : 'read'; ?>">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">
+                                                <?php echo htmlspecialchars($msg['name']); ?>
+                                                <small class="text-muted fw-normal ms-2"><?php echo htmlspecialchars($msg['email']); ?></small>
+                                            </h5>
+                                            <small class="text-muted"><?php echo date('d M Y, H:i', strtotime($msg['created_at'])); ?></small>
+                                        </div>
+                                        <p class="mb-2 mt-2 text-break"><?php echo nl2br(htmlspecialchars($msg['message'])); ?></p>
+                                        
+                                        <div class="d-flex gap-2 mt-2">
+                                            <?php if ($msg['status'] == 'unread'): ?>
+                                                <a href="?action=mark_read&id=<?php echo $msg['id']; ?>" class="btn btn-sm btn-success">
+                                                    <i class="bi bi-envelope-open"></i> Tandai Dibaca
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary mt-1">Sudah Dibaca</span>
+                                            <?php endif; ?>
+                                            
+                                            <a href="?action=delete&id=<?php echo $msg['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin hapus pesan ini?')">
+                                                <i class="bi bi-trash"></i> Hapus
+                                            </a>
+                                        </div>
+                                    </div>
+                                <?php endwhile; ?>
                             </div>
                         <?php else: ?>
-                            <div class="empty-state">
-                                <i class="bi bi-inbox" style="font-size: 4rem;"></i>
-                                <h5>Belum ada pesan masuk</h5>
-                                <p>Pesan dari formulir kontak akan muncul di sini</p>
+                            <div class="text-center p-5">
+                                <i class="bi bi-inbox fs-1 text-muted"></i>
+                                <p class="mt-3 text-muted">Belum ada pesan masuk.</p>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -298,17 +184,6 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
             </main>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Tandai semua pesan sebagai dibaca
-        <?php if (isset($_GET['action']) && $_GET['action'] == 'mark_all_read'): ?>
-            <?php
-            $stmt = $conn->prepare("UPDATE contact_messages SET status = 'read'");
-            $stmt->execute();
-            ?>
-            window.location.href = 'pesan_masuk.php';
-        <?php endif; ?>
-    </script>
 </body>
 </html>
