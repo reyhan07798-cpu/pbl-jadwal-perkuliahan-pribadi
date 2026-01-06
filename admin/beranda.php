@@ -1,5 +1,4 @@
 <?php
-// PERBAIKAN 1: Cek session agar tidak error jika sudah aktif
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -7,14 +6,12 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once '../koneksi.php';
 require_once 'fungsi.php'; 
 
-// PERBAIKAN 2: Redirect yang benar saat belum login
 if (
     !isset($_SESSION['loggedin']) ||
     $_SESSION['loggedin'] !== true ||
     !isset($_SESSION['role']) ||
     $_SESSION['role'] !== 'admin'
 ) {
-    // Arahkan ke halaman Login, jangan ke beranda lagi
     header('Location: ../Mahasiswa/login_mahasiswa.php');
     exit;
 }
@@ -32,10 +29,8 @@ if (isset($_SESSION['toast'])) {
     unset($_SESSION['toast']);
 }
 
-// ================= LOGIKA HALAMAN =================
  $page_title = 'Beranda';
 
-// Statistik
  $stmt_users = $conn->prepare("SELECT COUNT(*) FROM users");
  $stmt_users->execute();
  $total_users = $stmt_users->get_result()->fetch_row()[0];
@@ -69,9 +64,6 @@ if (isset($_SESSION['toast'])) {
 ");
  $recent_users->execute();
  $result_users = $recent_users->get_result();
-
-// PERBAIKAN 3: Query Pesan (INI YANG PENTING)
-// Kita TAMBAHKAN 'id', 'email', dan 'status' agar tidak error Undefined array key
  $recent_messages = $conn->prepare("
     SELECT id, name, email, message, status, created_at 
     FROM contact_messages 

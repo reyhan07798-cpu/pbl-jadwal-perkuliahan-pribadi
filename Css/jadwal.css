@@ -4,7 +4,7 @@
     --primary-dark: #1a4d80;
     --primary-light: #7ba7d7;
     --secondary-color: #6c757d;
-    --success-color: #fd0d0d;
+    --success-color: #28a745;
     --danger-color: #dc3545;
     --info-color: #17a2b8;
     --light-color: #f8f9fa;
@@ -29,7 +29,7 @@ body {
     background: linear-gradient(135deg, var(--primary-color) 0%, #5a87c4 100%);
     color: var(--text-color);
     min-height: 100vh;
-    padding: 20px;
+    padding: 10px;
 }
 
 /* --- Layout --- */
@@ -39,34 +39,40 @@ body {
     margin: 0 auto;
     border-radius: var(--border-radius);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    /* PERUBAHAN: Gunakan min-height dan flexbox untuk layout yang lebih kokoh */
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 95vh;
 }
 
 .app-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, #5a87c4 100%);
     color: var(--white-color);
     padding: 20px 30px;
-    flex-shrink: 0; /* Header tidak akan mengecil */
+    flex-shrink: 0;
 }
 
 .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .header-left h1 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     margin-bottom: 5px;
+}
+
+.header-left p {
+    font-size: 0.9rem;
 }
 
 .user-info {
     display: flex;
     align-items: center;
     gap: 15px;
+    flex-wrap: wrap;
 }
 
 .datetime-widget {
@@ -75,27 +81,38 @@ body {
     border-radius: var(--border-radius);
     text-align: center;
     backdrop-filter: blur(5px);
+    width: 100%;
+    max-width: 300px;
 }
 
-.datetime-day { font-weight: 600; }
-.datetime-time { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; }
+.datetime-day { font-weight: 600; font-size: 0.9rem; }
+.datetime-time { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
 
 .app-nav {
     display: flex;
     background: var(--light-color);
     border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0; /* Navigasi tidak akan mengecil */
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .nav-btn {
     flex: 1;
-    padding: 15px;
+    padding: 15px 10px;
     border: none;
     background: transparent;
     color: var(--primary-color);
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    font-size: 1rem;
+    white-space: nowrap;
+}
+.nav-btn i {
+    display: inline-block;
+    margin-right: 5px;
 }
 .nav-btn.active, .nav-btn:hover {
     background: var(--primary-color);
@@ -103,21 +120,20 @@ body {
 }
 
 .app-main {
-    /* PERUBAHAN: Main content akan mengisi sisa ruang yang tersedia */
     flex-grow: 1;
     padding: 20px;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .tab-content {
     display: none;
+    height: 100%;
+    flex-direction: column;
 }
-/* PERUBAHAN: Tab yang aktif akan mengisi seluruh ruang app-main */
 .tab-content.active {
     display: flex;
-    flex-direction: column;
-    flex-grow: 1;
 }
 
 /* --- Components --- */
@@ -131,7 +147,7 @@ body {
 }
 
 .btn {
-    padding: 10px 15px;
+    padding: 8px 12px;
     border: none;
     border-radius: var(--border-radius);
     cursor: pointer;
@@ -139,8 +155,10 @@ body {
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 5px;
     transition: var(--transition);
+    font-size: 0.9rem;
 }
 .btn-primary { background: var(--primary-color); color: var(--white-color); }
 .btn-secondary { background: var(--secondary-color); color: var(--white-color); }
@@ -157,56 +175,60 @@ body {
     border-radius: var(--border-radius);
     font-size: 1rem;
 }
-.form-group {
-    margin-bottom: 15px;
-}
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
 
 /* --- Schedule Page --- */
-/* PERUBAHAN: Layout akan mengisi seluruh ruang tab yang aktif */
 .schedule-layout {
     display: flex;
-    flex-grow: 1; /* Kunci: Biarkan layout mengisi tinggi yang tersedia */
+    flex-grow: 1;
     gap: 20px;
+    height: 100%;
+    overflow: hidden;
 }
+
 .schedule-sidebar {
+    flex: 0 0 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    min-width: 250px;
+}
+
+.schedule-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-.schedule-content {
-    flex: 3;
-    display: flex;
-    flex-direction: column;
+    min-width: 0;
 }
 
-/* PERUBAHAN: Card di dalam content akan mengisi sisa ruang */
 .schedule-content .card {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    margin-bottom: 0;
 }
 
-/* PERUBAHAN: Table container adalah area yang di-scroll */
 .schedule-content .table-container {
     flex-grow: 1;
     overflow-y: auto;
+    overflow-x: auto;
 }
 
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 600px; /* FIX: Mencegah gepeng di laptop kecil */
+    table-layout: fixed; /* FIX: Memaksa kolom jadi rata sama lebar */
 }
+
 .schedule-table th, .schedule-table td {
     border: 1px solid var(--border-color);
-    padding: 10px;
+    padding: 8px;
     text-align: center;
+    vertical-align: top;
 }
 .schedule-table th {
     background: var(--primary-dark);
@@ -215,26 +237,26 @@ body {
     position: sticky;
     top: 0;
     z-index: 5;
+    padding: 10px;
 }
 .schedule-table td {
     height: 120px;
-    vertical-align: top;
+    min-width: 100px;
 }
 
 .class-card {
     background: var(--primary-light);
     color: var(--text-color);
-    padding: 8px;
+    padding: 6px;
     border-radius: 4px;
     font-size: 0.8rem;
     margin-bottom: 5px;
     cursor: pointer;
     transition: var(--transition);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-.class-card:hover {
-    transform: scale(1.03);
-    box-shadow: var(--shadow);
-}
+.class-card:hover { transform: scale(1.02); box-shadow: var(--shadow); }
+
 .course-list-item {
     background: var(--light-color);
     border-left: 4px solid var(--primary-color);
@@ -244,250 +266,358 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
-.course-item-content {
-    flex-grow: 1;
-}
-.course-item-actions {
-    display: flex;
-    gap: 5px;
-}
+.course-item-content { flex-grow: 1; }
+.course-item-content strong { display: block; font-size: 0.95rem; }
+.course-item-content small { display: block; font-size: 0.8rem; color: #666; }
+.course-item-actions { display: flex; gap: 5px; flex-shrink: 0; }
 
-/* Batasi tinggi maksimal daftar mata kuliah */
 #course-list {
-    max-height: 450px;
+    flex-grow: 1;
     overflow-y: auto;
-    padding-right: 10px;
+    padding-right: 5px;
 }
 
 /* --- Calendar Page --- */
-/* PERUBAHAN: Buat card di dalam tab kalender mengisi penuh ruang */
 #calendar-tab .card {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 .calendar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     flex-shrink: 0;
 }
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    /* PERUBAHAN: Biarkan grid mengisi sisa tinggi dan bisa di-scroll */
+    gap: 5px;
     flex-grow: 1;
     overflow-y: auto;
+    min-height: 400px;
+    align-items: start; /* FIX: Kalender rapi atas */
 }
 .calendar-day-header {
     text-align: center;
     font-weight: bold;
-    padding: 10px;
+    padding: 8px;
     background: var(--light-color);
-    border-radius: var(--border-radius);
+    border-radius: 4px;
+    font-size: 0.9rem;
 }
 .calendar-day {
     border: 1px solid var(--border-color);
-    /* PERUBAHAN: Gunakan max-height dan tambahkan scroll di dalam kotak hari */
-    min-height: 100px;
-    max-height: 150px; /* Beri batas tinggi maksimal */
-    padding: 10px;
-    border-radius: var(--border-radius);
+    min-height: 80px;
+    padding: 5px;
+    border-radius: 4px;
     background: var(--white-color);
-    /* PERUBAHAN: Tambahkan scroll di dalam kotak hari */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
 }
-.calendar-day.today {
-    background: #FFDAB9;
-    border-color: #FFA07A;
-}
+.calendar-day.today { background: #FFDAB9; border-color: #FFA07A; }
 .calendar-day-number {
-    /* PERUBAHAN: Pastikan nomor hari tidak di-scroll */
     flex-shrink: 0;
-    margin-bottom: 5px;
+    margin-bottom: 3px;
     font-weight: bold;
+    font-size: 0.85rem;
 }
 .calendar-event, .calendar-note {
-    padding: 2px 5px;
-    margin-bottom: 3px;
+    padding: 2px 4px;
+    margin-bottom: 2px;
     border-radius: 3px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: all 0.2s ease-in-out;
 }
-.calendar-event {
-    background: #A2F5B6;
-    color: var(--text-color);
-}
-.calendar-note {
-    background: #FFD700;
-    color: var(--text-color);
-}
-.calendar-note:hover {
-    background-color: #ffed4e;
-    transform: scale(1.05);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
+.calendar-event { background: #A2F5B6; color: #000; }
+.calendar-note { background: #FFD700; color: #000; }
+.calendar-note:hover { background-color: #ffed4e; }
 
 /* --- Notes Page --- */
-.notes-layout {
-    display: block;
-    height: 100%;
-}
 .notes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
 }
 .note-card {
     background: var(--white-color);
     border: 1px solid var(--border-color);
     border-top: 4px solid var(--primary-color);
     border-radius: var(--border-radius);
-    padding: 20px;
+    padding: 15px;
     box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
     transition: var(--transition);
 }
-.note-card:hover {
-    transform: translateY(-5px);
-}
-.note-card-title {
-    font-size: 1.2rem;
-    color: var(--primary-color);
-    margin-bottom: 10px;
-}
-.note-card-date {
-    color: var(--secondary-color);
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-}
-.note-card-preview {
-    color: var(--text-color);
-    font-size: 0.9rem;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    flex-grow: 1;
-}
-.note-card-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 15px;
-}
+.note-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+.note-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.note-card-header h5 { font-size: 1.1rem; color: var(--primary-color); margin: 0; flex-grow: 1; margin-right: 10px; }
+.note-card-body p { font-size: 0.9rem; margin: 0; }
+.note-card-footer { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
 
 /* --- Modal --- */
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.6);
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 2000;
+    padding: 20px;
 }
 .modal-content {
     background: var(--white-color);
     padding: 20px;
     border-radius: var(--border-radius);
     max-width: 500px;
-    width: 90%;
-    max-height: 80vh;
+    width: 100%;
+    max-height: 90vh;
     overflow-y: auto;
     position: relative;
     animation: fadeIn 0.3s ease;
 }
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
 .modal-close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 28px;
-    cursor: pointer;
-    color: var(--secondary-color);
-}
-.modal-title {
-    margin-bottom: 15px;
-    color: var(--primary-color);
+    position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: #999;
 }
 
 /* --- Toast --- */
 .toast-container {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 2000;
+    position: fixed; top: 20px; right: 20px; z-index: 3000;
+    width: 90%; max-width: 350px;
 }
 .toast {
-    background: var(--primary-color);
-    color: var(--white-color);
-    padding: 15px 20px;
-    border-radius: var(--border-radius);
-    margin-bottom: 10px;
-    box-shadow: var(--shadow);
-    animation: slideIn 0.3s ease;
+    background: var(--primary-color); color: var(--white-color);
+    padding: 12px 15px; border-radius: var(--border-radius);
+    margin-bottom: 10px; box-shadow: var(--shadow);
+    font-size: 0.9rem;
 }
 .toast.success { background: var(--success-color); }
 .toast.error { background: var(--danger-color); }
-@keyframes slideIn {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
-}
 
-/* --- Utility --- */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
 .w-100 { width: 100%; }
 .text-center { text-align: center; }
 .text-muted { color: var(--secondary-color); }
 
-.schedule-title,
-.schedule-date {
-    text-align: center;
+/* --- Helper Classes for UI --- */
+.notes-list-in-modal { margin-top: 15px; max-height: 200px; overflow-y: auto; }
+.note-snippet { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px; padding: 10px; margin-bottom: 10px; cursor: pointer; }
+.schedule-title { font-size: 1.2rem; font-weight: bold; margin: 0; }
+.schedule-date { font-size: 0.9rem; color: var(--secondary-color); margin-bottom: 10px; }
+
+/* =========================================
+   RESPONSIVE (FIX ANTI-BUG / STANDAR)
+   ========================================= */
+
+/* Tablet & HP Portrait */
+@media (max-width: 768px) {
+    /* 1. Reset Layout HP (Paling Aman) */
+    body { padding: 0; overflow-x: hidden; }
+    .app-container { 
+        width: 100%; 
+        max-width: 100%; 
+        border-radius: 0; 
+        min-height: 100vh; 
+        margin: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    /* 2. Header: Susun Vertikal, Rata Kiri (Agar Tidak Overlap) */
+    .app-header { position: relative; /* Matikan sticky biar ga bug */ }
+    
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start; /* Paksa rata kiri agar teks panjang tidak aneh */
+        gap: 10px;
+    }
+    
+    .header-right {
+        width: 100%;
+        display: flex;
+        flex-direction: column-reverse; /* Jam di atas */
+        gap: 10px;
+    }
+    
+    .user-info {
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        padding-bottom: 10px;
+    }
+
+    .datetime-widget {
+        width: 100%;
+        max-width: none;
+        justify-content: center;
+        text-align: center;
+        background: rgba(255,255,255,0.15);
+    }
+
+    /* 3. Navigasi: Bisa Scroll Horizontal */
+    .app-nav { 
+        position: relative; /* Matikan sticky */
+        overflow-x: auto; 
+        white-space: nowrap; 
+        -webkit-overflow-scrolling: touch; /* Scroll halus */
+    }
+    .nav-btn { flex: 0 0 auto; padding: 12px 20px; }
+
+    /* 4. Layout Utama: Stack Vertikal */
+    .app-main { padding: 15px; overflow: visible; /* Biarkan scroll halaman bebas */ }
+
+    .schedule-layout {
+        flex-direction: column;
+        overflow: visible;
+        gap: 20px;
+    }
+
+    /* 5. Sidebar: Full Width */
+    .schedule-sidebar { 
+        width: 100%; 
+        flex: none;
+        overflow: visible; /* Biarkan sidebar tampil penuh */
+        margin-bottom: 20px;
+    }
+
+    /* 6. Tabel: FIX UTAMA */
+    .schedule-content {
+        flex: 1;
+        width: 100%;
+        overflow: visible; /* Jangan batasi tinggi parent */
+    }
+    
+    .schedule-content .card {
+        margin-bottom: 0;
+        display: block; /* Ubah dari flex ke block biar normal */
+    }
+
+    /* Area Scroll Khusus Tabel */
+    .schedule-content .table-container {
+        overflow-x: auto; 
+        width: 100%;
+        border: 1px solid #eee;
+        border-radius: 8px;
+    }
+
+    .schedule-table {
+        width: 100%; /* Sesuaikan layar */
+        min-width: 600px; /* Tapi minimal tetap lebar agar rata */
+        table-layout: fixed;
+    }
+
+    /* 7. KALENDER HP (YANG ANDA MINTA) */
+    .calendar-grid {
+        gap: 5px; /* Jarak antar kotak tanggal */
+    }
+    
+    /* Perbesar Kotak Tanggal & Tulisan Mata Kuliah */
+    .calendar-day {
+        min-height: 110px; /* SEBELUMNYA 80px -> Di jadiin 110px biar luas */
+        padding: 6px; /* Tambah padding biar teks ga nempel pinggir */
+    }
+    
+    /* Perbesar Tulisan Mata Kuliah agar gk kepotong */
+    .calendar-event, .calendar-note {
+        font-size: 0.85rem; /* SEBELUMNYA 0.7rem -> Di jadiin 0.85rem biar besar */
+        padding: 4px 6px;
+        white-space: normal; /* Biarkan teks turun baris jika kepanjangan */
+        height: auto; 
+    }
+    
+    /* Header hari juga dibesarkan sedikit */
+    .calendar-day-header {
+        font-size: 0.8rem; 
+        padding: 6px;
+    }
+    
+    /* Nomor tanggal diperbesar */
+    .calendar-day-number {
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+    }
+
+    /* 8. Catatan: 1 Kolom */
+    .notes-grid { grid-template-columns: 1fr; }
 }
 
-.schedule-date {
-    font-weight: 500;
-    color: var(--secondary-color);
-    margin-bottom: 15px;
+/* HP Kecil */
+@media (max-width: 480px) {
+    .header-left h1 { font-size: 1.2rem; }
+    
+    /* Tabel: Kecilkan font biar muat horizontal scroll */
+    .schedule-table th, .schedule-table td { font-size: 0.8rem; padding: 6px 4px; }
+    
+    .btn { font-size: 0.85rem; padding: 8px 12px; }
+    
+    /* Kalender di HP Kecil tetap usahakan terbaca */
+    .calendar-day { min-height: 100px; }
+}
+/* ... bagian lain tetap sama ... */
+
+/* ... bagian lain tetap sama ... */
+
+/* 7. KALENDER HP (TETAP RATA WALAU ISI BANYAK) */
+.calendar-grid {
+    gap: 2px; 
+    
+    /* PENTING: Agar kotak rata atas semua, walau isinya berbeda */
+    align-items: start; 
 }
 
-/* Gaya untuk daftar catatan di dalam modal */
-.notes-list-in-modal {
-    margin-top: 15px;
-    max-height: 200px;
-    overflow-y: auto;
+/* Kotak Tanggal */
+.calendar-day {
+    height: 120px; /* DARI MIN-HEIGHT JADI HEIGHT: Tingganya TETAP, tidak ikut memanjang */
+    overflow-y: auto; /* Jika isinya banyak, di-scroll aja di dalam kotak */
+    padding: 4px;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Isi kotak rata atas */
 }
 
-.note-snippet {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    padding: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
+/* Tulisan Mata Kuliah */
+.calendar-event, .calendar-note {
+    font-size: 0.8rem;
+    line-height: 1.3;
+    padding: 2px 4px;
+    
+    white-space: normal;
+    word-break: break-word;
+    
+    /* Batasi 2-3 baris saja */
+    display: -webkit-box;
+    -webkit-line-clamp: 3; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    
+    margin-bottom: 1px;
+    width: 100%; /* Pastikan lebar penuh */
 }
 
-.note-snippet:hover {
-    background-color: #e9ecef;
+/* Header hari */
+.calendar-day-header {
+    font-size: 0.75rem; 
+    padding: 4px;
 }
 
-.note-snippet strong {
-    display: block;
-    margin-bottom: 5px;
+/* Nomor tanggal */
+.calendar-day-number {
+    font-size: 0.9rem;
+    margin-bottom: 2px;
 }
+
+/* 8. Catatan: 1 Kolom */
+.notes-grid { grid-template-columns: 1fr; }

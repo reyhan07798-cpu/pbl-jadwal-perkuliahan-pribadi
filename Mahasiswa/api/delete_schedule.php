@@ -12,7 +12,6 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_
 }
  $user_id = $_SESSION["id"];
 
-// PATH SUDAH DIPERBAIKI
 require_once '../../koneksi.php';
 
  $data = json_decode(file_get_contents("php://input"));
@@ -20,8 +19,6 @@ require_once '../../koneksi.php';
 if (!empty($data->course_id)) {
     $course_id = $data->course_id;
 
-    // Karena ada ON DELETE CASCADE, menghapus dari tabel courses akan otomatis menghapus
-    // data yang terkait di tabel schedules.
     $sql = "DELETE FROM courses WHERE id = ? AND user_id = ?";
     
     if ($stmt = $conn->prepare($sql)) {

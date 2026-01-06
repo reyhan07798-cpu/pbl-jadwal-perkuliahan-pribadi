@@ -39,9 +39,15 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
         </header>
 
         <nav class="app-nav">
-            <button class="nav-btn active" data-tab="schedule"><i class="bi bi-calendar-week"></i> Jadwal Mingguan</button>
-            <button class="nav-btn" data-tab="calendar"><i class="bi bi-calendar3"></i> Kalender</button>
-            <button class="nav-btn" data-tab="notes"><i class="bi bi-journal-text"></i> Catatan</button>
+            <button class="nav-btn active" data-tab="schedule">
+                <i class="bi bi-calendar-week"></i> <span>Jadwal Mingguan</span>
+            </button>
+            <button class="nav-btn" data-tab="calendar">
+                <i class="bi bi-calendar3"></i> <span>Kalender</span>
+            </button>
+            <button class="nav-btn" data-tab="notes">
+                <i class="bi bi-journal-text"></i> <span>Catatan</span>
+            </button>
         </nav>
 
         <main class="app-main">
@@ -52,21 +58,20 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
                         <div class="card">
                             <button id="add-course-btn" class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> Tambah Mata Kuliah</button>
                         </div>
-                        <div class="card">
+                        <div class="card" style="display: flex; flex-direction: column; overflow: hidden;">
                             <h5><i class="bi bi-list-ul"></i> Daftar Mata Kuliah</h5>
                             <input type="text" class="form-control" id="search-course" placeholder="Cari mata kuliah atau dosen...">
-                            <div id="course-list"></div>
+                            <div id="course-list" style="margin-top: 10px; padding-right: 5px;"></div>
                         </div>
                     </aside>
+                    
                     <div class="schedule-content">
                       <div class="card">
-                        <!-- PERUBAHAN: Header diubah untuk menampung tombol export -->
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
                                 <h4 class="schedule-title">Jadwal Mingguan</h4>
                                 <p id="current-week-date" class="schedule-date"></p>
                             </div>
-                            <!-- PERUBAHAN: Tombol Export PDF ditambahkan di sini -->
                             <button id="export-pdf-btn" class="btn btn-success">
                                 <i class="bi bi-file-earmark-pdf"></i> Export PDF
                             </button>
