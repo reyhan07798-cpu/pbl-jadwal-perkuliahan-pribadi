@@ -2,55 +2,58 @@
 require_once '../koneksi.php';
 require_once 'fungsi.php';
 
-// Judul halaman menjadi "Daftar Mata Kuliah"
- $page_title = 'Daftar Mata Kuliah';
+$page_title = 'Daftar Mata Kuliah';
 
-// Query untuk menampilkan semua mata kuliah
- $stmt = $conn->prepare("SELECT id, course_name, dosen, sks, room FROM courses ORDER BY course_name ASC");
- $stmt->execute();
- $courses = $stmt->get_result();
+$stmt = $conn->prepare(
+    "SELECT id, course_name, dosen, sks, room 
+     FROM courses 
+     ORDER BY course_name ASC"
+);
+$stmt->execute();
+$courses = $stmt->get_result();
 
- $conn->close();
-
+$conn->close();
 ob_start();
 ?>
 
 <div class="card shadow mb-4">
-    <!--  Judul card dan hapus tombol "Tambah" -->
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Daftar Mata Kuliah yang Tersedia</h6>
+        <h6 class="m-0 font-weight-bold text-primary">
+            Daftar Mata Kuliah yang Tersedia
+        </h6>
     </div>
+
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-bordered text-center">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>No</th>
                         <th>Nama Mata Kuliah</th>
                         <th>Dosen Pengajar</th>
                         <th>SKS</th>
                         <th>Ruangan</th>
-                        <!-- Hapus kolom "Aksi" -->
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($courses->num_rows > 0): ?>
-                        <?php while($course = $courses->fetch_assoc()): ?>
+                <?php if ($courses->num_rows > 0): ?>
+                    <?php $no = 1; ?>
+                    <?php while ($course = $courses->fetch_assoc()): ?>
                         <tr>
-                            <td><?php echo $course['id']; ?></td>
-                            <td><?php echo htmlspecialchars($course['course_name']); ?></td>
-                            <td><?php echo htmlspecialchars($course['dosen']); ?></td>
-                            <td><?php echo htmlspecialchars($course['sks']); ?></td>
-                            <td><?php echo htmlspecialchars($course['room']); ?></td>
-                            <!-- Hapus tombol Edit dan Hapus -->
+                            <td><?= $no++; ?></td>
+                            <td><?= htmlspecialchars($course['course_name']); ?></td>
+                            <td><?= htmlspecialchars($course['dosen']); ?></td>
+                            <td><?= htmlspecialchars($course['sks']); ?></td>
+                            <td><?= htmlspecialchars($course['room']); ?></td>
                         </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <tr>
-                            <!--  Sesuaikan colspan -->
-                            <td colspan="5" class="text-center">Belum ada mata kuliah yang tersedia.</td>
-                        </tr>
-                    <?php endif; ?>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            Belum ada mata kuliah yang tersedia.
+                        </td>
+                    </tr>
+                <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -58,6 +61,6 @@ ob_start();
 </div>
 
 <?php
- $page_content = ob_get_clean();
+$page_content = ob_get_clean();
 require_once 'tema.php';
 ?>

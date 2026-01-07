@@ -77,28 +77,44 @@ ob_start();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($users->num_rows > 0): ?>
-                        <?php while($user = $users->fetch_assoc()): ?>
-                        <tr>
-                            <td><?php echo $user['id']; ?></td>
-                            <td><?php echo htmlspecialchars($user['username']); ?></td>
-                            <td><?php echo htmlspecialchars($user['email']); ?></td>
-                            <td><span class="badge bg-<?php echo $user['role'] == 'admin' ? 'danger' : 'info'; ?>"><?php echo ucfirst($user['role']); ?></span></td>
-                            <td><?php echo date('d M Y', strtotime($user['created_at'])); ?></td>
-                            <td>
-                                <a href="lihat_jadwal_pengguna.php?id=<?php echo $user['id']; ?>" class="btn btn-success btn-sm" title="Lihat Jadwal"><i class="bi bi-calendar-check"></i></a>
-                                <a href="tambah_pengguna.php?id=<?php echo $user['id']; ?>" class="btn btn-info btn-sm" title="Ubah Data"><i class="bi bi-pencil"></i></a>
-                                <a href="kelola_pengguna.php?reset_id=<?php echo $user['id']; ?>" class="btn btn-warning btn-sm" title="Reset Password" onclick="return confirm('Yakin ingin mereset password pengguna ini?')"><i class="bi bi-key"></i></a>
-                                <a href="kelola_pengguna.php?delete_id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm" title="Hapus" onclick="return confirm('Yakin ingin menghapus pengguna ini?')"><i class="bi bi-trash"></i></a>
-                            </td>
-                        </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="6" class="text-center">Tidak ada data pengguna.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
+<?php if ($users->num_rows > 0): ?>
+    <?php $no = 1; ?>
+    <?php while($user = $users->fetch_assoc()): ?>
+    <tr>
+        <td><?php echo $no++; ?></td>
+        <td><?php echo htmlspecialchars($user['username']); ?></td>
+        <td><?php echo htmlspecialchars($user['email']); ?></td>
+        <td>
+            <span class="badge bg-<?php echo $user['role'] == 'admin' ? 'danger' : 'info'; ?>">
+                <?php echo ucfirst($user['role']); ?>
+            </span>
+        </td>
+        <td><?php echo date('d M Y', strtotime($user['created_at'])); ?></td>
+        <td>
+            <a href="lihat_jadwal_pengguna.php?id=<?php echo $user['id']; ?>" class="btn btn-success btn-sm">
+                <i class="bi bi-calendar-check"></i>
+            </a>
+            <a href="tambah_pengguna.php?id=<?php echo $user['id']; ?>" class="btn btn-info btn-sm">
+                <i class="bi bi-pencil"></i>
+            </a>
+            <a href="kelola_pengguna.php?reset_id=<?php echo $user['id']; ?>" class="btn btn-warning btn-sm"
+               onclick="return confirm('Reset password pengguna ini?')">
+                <i class="bi bi-key"></i>
+            </a>
+            <a href="kelola_pengguna.php?delete_id=<?php echo $user['id']; ?>" class="btn btn-danger btn-sm"
+               onclick="return confirm('Hapus pengguna ini?')">
+                <i class="bi bi-trash"></i>
+            </a>
+        </td>
+    </tr>
+    <?php endwhile; ?>
+<?php else: ?>
+    <tr>
+        <td colspan="6" class="text-center">Tidak ada data pengguna.</td>
+    </tr>
+<?php endif; ?>
+</tbody>
+
             </table>
         </div>
     </div>
