@@ -19,10 +19,8 @@ require_once '../../koneksi.php';
 
 // Tambahkan validasi untuk note_date
 if (!empty($data->title) && !empty($data->content) && !empty($data->note_date)) {
-    //Tambahkan note_date ke query
     $sql = "INSERT INTO notes (user_id, title, content, note_date) VALUES (?, ?, ?, ?)";
     if ($stmt = $conn->prepare($sql)) {
-        //Tambahkan 's' untuk tipe string note_date
         $stmt->bind_param("isss", $user_id, $data->title, $data->content, $data->note_date);
         if ($stmt->execute()) {
             http_response_code(201);

@@ -1,7 +1,6 @@
 <?php
 // --- VERSI FINAL: OTOMATIS MENYESUAIIKAN LOKASI VENDOR ---
 
-// 1. Cek login
 session_start();
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     http_response_code(401);
@@ -10,11 +9,9 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     exit();
 }
 
-// 2. Tentukan path ke folder vendor
 // Script ini berada di /Mahasiswa/api/, jadi kita naik dua level untuk mencapai folder utama proyek
  $vendorPath = __DIR__ . '/../../vendor/autoload.php';
 
-// 3. Cek apakah file vendor/autoload.php ada
 if (!file_exists($vendorPath)) {
     http_response_code(500);
     header('Content-Type: application/json');
@@ -25,7 +22,6 @@ if (!file_exists($vendorPath)) {
     exit();
 }
 
-// 4. Jika file ditemukan, lanjutkan
 try {
     require_once $vendorPath;
 } catch (Exception $e) {
@@ -37,7 +33,6 @@ try {
     exit();
 }
 
-// 5. Ambil dan validasi data JSON
  $json_data = file_get_contents('php://input');
  $data = json_decode($json_data, true);
 
@@ -65,7 +60,6 @@ if (empty($courses) || empty($schedules)) {
     exit();
 }
 
-// 6. Buat PDF
 try {
     $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 

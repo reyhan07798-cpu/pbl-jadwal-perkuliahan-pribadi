@@ -19,10 +19,8 @@ require_once '../../koneksi.php';
 
 // Tambahkan validasi untuk note_date
 if (!empty($data->id) && !empty($data->title) && !empty($data->content) && !empty($data->note_date)) {
-    //Tambahkan note_date ke query UPDATE
     $sql = "UPDATE notes SET title = ?, content = ?, note_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?";
     if ($stmt = $conn->prepare($sql)) {
-        //Tambahkan 's' untuk tipe string note_date dan sesuaikan urutan
         $stmt->bind_param("sssii", $data->title, $data->content, $data->note_date, $data->id, $user_id);
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {

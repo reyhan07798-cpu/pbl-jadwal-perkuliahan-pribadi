@@ -3,7 +3,6 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 
-// Memulai session
 session_start();
 
 // Cek apakah user sudah login
@@ -35,10 +34,8 @@ if (isset($_GET['id'])) {
         $result = $stmt->get_result();
         
         if ($row = $result->fetch_assoc()) {
-            // Jika data ditemukan, kembalikan dalam format JSON
             echo json_encode($row);
         } else {
-            // Jika tidak ditemukan, kirim response 404
             http_response_code(404);
             echo json_encode(array("message" => "Mata kuliah tidak ditemukan atau bukan milik Anda."));
         }
@@ -50,6 +47,5 @@ if (isset($_GET['id'])) {
     echo json_encode(array("message" => "Parameter ID tidak disertakan dalam permintaan."));
 }
 
-// Tutup koneksi
  $conn->close();
 ?>

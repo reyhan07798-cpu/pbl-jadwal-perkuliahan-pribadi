@@ -64,7 +64,6 @@ if (
         echo json_encode(array("message" => "Gagal menambah data. Error: " . $e->getMessage()));
     }
 
-    // Tutup statement
     $stmt_course->close();
     $stmt_schedule->close();
 } else {
@@ -73,6 +72,5 @@ if (
     echo json_encode(array("message" => "Gagal menambah data. Data tidak lengkap. Mohon periksa kembali inputan Anda."));
 }
 
-// Tutup koneksi
  $conn->close();
 ?>
