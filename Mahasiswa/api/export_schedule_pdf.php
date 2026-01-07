@@ -61,7 +61,7 @@ if (!$data || !isset($data['courses']) || !isset($data['schedules'])) {
 if (empty($courses) || empty($schedules)) {
     http_response_code(400);
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Data jadwal atau mata kuliah kosong. Tidak ada yang bisa diekspor.']);
+    echo json_encode(['error' => 'Data jadwal atau mata kuliah kosong. Tidak ada yang bisa di unduh.']);
     exit();
 }
 

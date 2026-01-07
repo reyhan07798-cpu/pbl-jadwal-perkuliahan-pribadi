@@ -73,7 +73,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
                                 <p id="current-week-date" class="schedule-date"></p>
                             </div>
                             <button id="export-pdf-btn" class="btn btn-success">
-                                <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                                <i class="bi bi-file-earmark-pdf"></i> Unduh PDF
                             </button>
                         </div>
                         <div class="table-container">
