@@ -16,12 +16,12 @@ if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
 
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty(trim($_POST["username"]))){
-        $username_err = "Masukkan username.";
+        $username_err = "Masukkan Nama.";
     } else {
         $username = trim($_POST["username"]);
     }
     if(empty(trim($_POST["password"]))){
-        $password_err = "Masukkan password.";
+        $password_err = "Masukkan Kata sandi.";
     } else {
         $password = trim($_POST["password"]);
     }
@@ -55,14 +55,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 }
                                 exit; 
                             } else{
-                                $login_err = "Username atau password tidak valid.";
+                                $login_err = "Nama atau kata sandi tidak valid.";
                             }
                         } else {
                             $login_err = "Terjadi kesalahan dengan akun Anda. Silakan hubungi administrator.";
                         }
                     }
                 } else{
-                    $login_err = "Username atau password tidak valid.";
+                    $login_err = "Nama atau kata sandi tidak valid.";
                 }
             } else{
                 echo "Oops! Ada yang salah. Silakan coba lagi nanti.";
@@ -78,7 +78,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Aplikasi Jadwal</title>
+    <title>Masuk Aplikasi Jadwal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../Css/login_mahasiswa.css">
@@ -89,18 +89,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             <div class="col-md-6 col-lg-4">
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
-                        <h2 class="card-title text-center mb-4">Login</h2>
-                        <p class="text-center text-muted mb-4">Silakan masukkan username dan password.</p>
+                        <h2 class="card-title text-center mb-4">Masuk</h2>
+                        <p class="text-center text-muted mb-4">Silakan masukkan nama dan kata sandi.</p>
                         <?php if(!empty($login_err)){ echo '<div class="alert alert-danger" role="alert">' . $login_err . '</div>'; } ?>
                         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                             <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
+                                <label for="username" class="form-label">Nama</label>
                                 <input type="text" name="username" id="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($username); ?>">
                                 <?php if(!empty($username_err)){ echo '<div class="invalid-feedback">' . $username_err . '</div>'; } ?>
                             </div>    
                             
                             <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
+                                <label for="password" class="form-label">Kata sandi</label>
                                 <div class="input-group">
                                     <input type="password" name="password" id="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" required>
                                     <span class="input-group-text" id="togglePassword">
@@ -111,9 +111,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             </div>
                             
                             <div class="d-grid">
-                                <input type="submit" class="btn btn-primary" value="Login">
+                                <input type="submit" class="btn btn-primary" value="Masuk">
                             </div>
-                            <p class="text-center mt-3 mb-0"><a href="lupa_password.php">Lupa Password?</a></p>
+                            <p class="text-center mt-3 mb-0"><a href="lupa_password.php">Lupa kata sandi?</a></p>
                         </form>
                         <hr>
                         <p class="text-center mb-0">Belum punya akun? <a href="register.php">Daftar sekarang</a>.</p>

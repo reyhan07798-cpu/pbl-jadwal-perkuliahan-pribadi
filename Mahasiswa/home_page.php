@@ -422,7 +422,7 @@
                 <li><a href="#">Beranda</a></li>
                 <li><a href="#kontak">Kontak Kami</a></li>
                 <li>
-                    <a href="login_mahasiswa.php" class="btn-login">Login</a>
+                    <a href="login_mahasiswa.php" class="btn-login">Masuk</a>
                 </li>
             </ul>
         </nav>

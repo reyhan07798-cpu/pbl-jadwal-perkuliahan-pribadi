@@ -90,7 +90,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <?php if(!empty($register_err)){ echo '<div class="alert alert-danger" role="alert">' . $register_err . '</div>'; } ?>
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
+                        <label for="username" class="form-label">Nama</label>
                         <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo htmlspecialchars($username); ?>">
                         <div class="invalid-feedback"><?php echo $username_err; ?></div>
                     </div>
@@ -100,12 +100,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <div class="invalid-feedback"><?php echo $email_err; ?></div>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
+                        <label for="password" class="form-label">Kata Sandi</label>
                         <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
                         <div class="invalid-feedback"><?php echo $password_err; ?></div>
                     </div>
                     <div class="mb-4">
-                        <label for="confirm_password" class="form-label">Konfirmasi Password</label>
+                        <label for="confirm_password" class="form-label">Konfirmasi Kata Sandi</label>
                         <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>">
                         <div class="invalid-feedback"><?php echo $confirm_password_err; ?></div>
                     </div>
@@ -114,7 +114,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     </div>
                 </form>
                 <hr>
-                <p class="text-center mb-0">Sudah punya akun? <a href="login_mahasiswa.php">Login di sini</a>.</p>
+                <p class="text-center mb-0">Sudah punya akun? <a href="login_mahasiswa.php">Masuk di sini</a>.</p>
             </div>
         </div>
     </div>
