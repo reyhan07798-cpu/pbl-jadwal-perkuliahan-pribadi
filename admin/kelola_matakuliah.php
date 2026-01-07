@@ -2,7 +2,7 @@
 require_once '../koneksi.php';
 require_once 'fungsi.php';
 
-// PERUBAHAN: Judul halaman menjadi "Daftar Mata Kuliah"
+// Judul halaman menjadi "Daftar Mata Kuliah"
  $page_title = 'Daftar Mata Kuliah';
 
 // Query untuk menampilkan semua mata kuliah
@@ -16,7 +16,7 @@ ob_start();
 ?>
 
 <div class="card shadow mb-4">
-    <!-- PERUBAHAN: Judul card dan hapus tombol "Tambah" -->
+    <!--  Judul card dan hapus tombol "Tambah" -->
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">Daftar Mata Kuliah yang Tersedia</h6>
     </div>
@@ -30,7 +30,7 @@ ob_start();
                         <th>Dosen Pengajar</th>
                         <th>SKS</th>
                         <th>Ruangan</th>
-                        <!-- PERUBAHAN: Hapus kolom "Aksi" -->
+                        <!-- Hapus kolom "Aksi" -->
                     </tr>
                 </thead>
                 <tbody>
@@ -42,12 +42,12 @@ ob_start();
                             <td><?php echo htmlspecialchars($course['dosen']); ?></td>
                             <td><?php echo htmlspecialchars($course['sks']); ?></td>
                             <td><?php echo htmlspecialchars($course['room']); ?></td>
-                            <!-- PERUBAHAN: Hapus tombol Edit dan Hapus -->
+                            <!-- Hapus tombol Edit dan Hapus -->
                         </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
                         <tr>
-                            <!-- PERUBAHAN: Sesuaikan colspan -->
+                            <!--  Sesuaikan colspan -->
                             <td colspan="5" class="text-center">Belum ada mata kuliah yang tersedia.</td>
                         </tr>
                     <?php endif; ?>

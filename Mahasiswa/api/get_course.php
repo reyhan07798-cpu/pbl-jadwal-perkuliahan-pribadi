@@ -16,8 +16,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_
 // Ambil user_id dari session
  $user_id = $_SESSION["id"];
 
-// Sertakan file koneksi
-// Path ini naik dua tingkat dari folder api ke folder utama
+
 require_once '../../koneksi.php';
 
 // Cek apakah parameter 'id' ada di URL

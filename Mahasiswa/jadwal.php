@@ -92,7 +92,6 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
                         <button id="next-month-btn" class="btn btn-secondary"><i class="bi bi-chevron-right"></i></button>
                     </div>
                     <div class="calendar-grid" id="calendar-grid">
-                        <!-- Kalender akan di-generate oleh JavaScript -->
                     </div>
                 </div>
             </section>
@@ -107,7 +106,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
                         
                         <h4><i class="bi bi-journal-text"></i> Daftar Catatan</h4>
                         <div class="notes-grid" id="notes-grid">
-                            <!-- Daftar catatan akan di-generate oleh JavaScript -->
+                            
                         </div>
                     </div>
                 </div>

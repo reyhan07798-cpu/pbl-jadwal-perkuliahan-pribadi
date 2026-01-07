@@ -162,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadData() {
         try {
-            // Parallel loading untuk performa lebih cepat
             const [schedulesData, notesData] = await Promise.all([
                 api.fetchSchedule(),
                 api.fetchNotes()
@@ -171,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
             state.schedules = schedulesData;
             state.notes = notesData;
 
-            // Map schedules ke courses unik
             const uniqueCourses = new Map();
             state.schedules.forEach(schedule => {
                 if (!uniqueCourses.has(schedule.course_id)) {
@@ -190,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Failed to load data:", error);
             showToast(error.message || "Terjadi kesalahan memuat data.", 'error');
-            renderAll(); // Tetap render meski error (kosong)
+            renderAll(); 
         }
     }
 
@@ -232,9 +230,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderScheduleTable() {
-        // Render Header
+        
         const thead = `<tr>${DAYS.map(day => `<th>${day}</th>`).join('')}</tr>`;
-        // Render Body Cells
+        
         const tbody = `<tr>${DAYS.map(day => `<td data-day="${day}"></td>`).join('')}</tr>`;
         elements.scheduleTable.innerHTML = thead + tbody;
 
@@ -261,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderCalendar() {
-        // Bersihkan Grid
+        
         elements.calendarGrid.innerHTML = '';
         
         // Render Header Hari (Minggu - Sabtu)
@@ -295,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
                           state.currentMonth === new Date().getMonth() && 
                           state.currentYear === new Date().getFullYear();
 
-            // Buat Elemen Kotak
+            //Elemen Kotak
             const dayCell = document.createElement('div');
             dayCell.classList.add('calendar-day');
             if (isToday) dayCell.classList.add('today');
@@ -309,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dayCell.appendChild(dayNumber);
 
             // TAMBAHKAN EVENT (MK & NOTES) DISINI
-            // Kode ini membuat MK muncul di kalender TANPA JAM
+            // MK muncul di kalender TANPA JAM
             const eventsHtml = getCalendarEvents(dateStr, dayName);
             if (eventsHtml) {
                 dayCell.innerHTML += eventsHtml;

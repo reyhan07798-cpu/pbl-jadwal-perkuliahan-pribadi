@@ -2,7 +2,7 @@
 session_start();
 require_once "../koneksi.php";
 
-// Cek apakah user sudah login, jika belum redirect ke halaman login
+
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login_mahasiswa.php");
     exit;
@@ -52,6 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($stmt->num_rows == 1) {
                     $stmt->bind_result($hashed_password);
                     if ($stmt->fetch()) {
+                        
                         // Verifikasi password lama yang dimasukkan user dengan password di database
                         if (password_verify($current_password, $hashed_password)) {
                             

@@ -47,13 +47,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                                 $_SESSION["username"] = $username_db;
                                 $_SESSION["role"] = $role;
                     
-                                // PERBAIKAN: Menambahkan kurung kurawal {
+                                
                                 if ($_SESSION['role'] == 'admin') {
                                     header("location: ../admin/beranda.php");
                                 } else {
                                     header("location: ../Mahasiswa/jadwal.php");
                                 }
-                                exit; // PERBAIKAN: Menambahkan kurung kurawal }
+                                exit; 
                             } else{
                                 $login_err = "Username atau password tidak valid.";
                             }
@@ -80,7 +80,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Aplikasi Jadwal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Menggunakan Bootstrap Icons untuk ikon mata -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../Css/login_mahasiswa.css">
 </head>
@@ -102,7 +101,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <!-- Menggunakan input-group untuk menggabungkan field input dan tombol mata -->
                                 <div class="input-group">
                                     <input type="password" name="password" id="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" required>
                                     <span class="input-group-text" id="togglePassword">
@@ -132,13 +130,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         const toggleIcon = document.querySelector('#toggleIcon');
 
         togglePassword.addEventListener('click', function (e) {
-            // Cek tipe saat ini
             const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
             
-            // Ubah tipe
             password.setAttribute('type', type);
             
-            // Ubah ikon (bi-eye-slash vs bi-eye)
             this.querySelector('i').classList.toggle('bi-eye');
             this.querySelector('i').classList.toggle('bi-eye-slash');
         });

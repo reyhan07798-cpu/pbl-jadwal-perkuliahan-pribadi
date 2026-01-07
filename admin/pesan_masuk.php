@@ -91,7 +91,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* --- CSS KHUSUS AGAR TIDAK BUG & RAPI (SAMA DENGAN DASHBOARD) --- */
+        
         
         body {
             background-color: #f4f6f9;
@@ -100,11 +100,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
 
         /* 1. NAVBAR ATAS (KOTAK BIRU) */
         .navbar-custom {
-            height: 60px; /* Paksa tinggi tetap agar tidak gede/berubah-ubah */
+            height: 60px; 
             background: linear-gradient(135deg, #1a4d80, #2c7be0);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 1030; /* Di atas segalanya */
-            position: fixed; /* Fixed agar tidak ikut scroll */
+            z-index: 1030; 
+            position: fixed; 
             top: 0; left: 0; right: 0;
         }
 
@@ -112,7 +112,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
         .d-flex-wrapper {
             display: flex;
             width: 100%;
-            margin-top: 60px; /* Jarak ke bawah navbar fixed */
+            margin-top: 60px; 
             min-height: calc(100vh - 60px);
         }
 
@@ -125,7 +125,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
             border-right: 1px solid #dee2e6;
             display: flex;
             flex-direction: column;
-            overflow-y: auto; /* Scroll jika menu terlalu panjang */
+            overflow-y: auto; 
         }
 
         /* Styling Menu Sidebar */
@@ -140,7 +140,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
         .nav-link:hover, .nav-link.active {
             background-color: #e9ecef;
             color: #0d6efd;
-            padding-left: 25px; /* Efek geser sedikit saat hover */
+            padding-left: 25px; 
         }
 
         /* 4. LOGIKA RESPONSIVE (HP vs LAPTOP) */
@@ -153,13 +153,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                 left: 0;
                 bottom: 0;
                 z-index: 1020;
-                transform: translateX(-100%); /* Default: Tersembunyi di kiri */
+                transform: translateX(-100%); 
                 box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             }
 
             /* Ketika Sidebar Aktif (3 garis diklik di HP) */
             .sidebar.active {
-                transform: translateX(0); /* Meluncur keluar */
+                transform: translateX(0); 
             }
 
             /* Overlay Gelap saat menu buka di HP */
@@ -185,7 +185,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
         /* --- DESKTOP (LAPTOP) --- */
         @media (min-width: 768px) {
             .sidebar {
-                display: block !important; /* Paksa muncul di laptop */
+                display: block !important; 
                 width: 250px;
             }
 
@@ -202,8 +202,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                 width: 100%;
                 transition: width 0.3s ease-in-out;
             }
-            
-            #sidebarOverlay { display: none !important; } /* Overlay tidak dipakai di desktop */
+
+            #sidebarOverlay { display: none !important; } 
         }
     </style>
 </head>

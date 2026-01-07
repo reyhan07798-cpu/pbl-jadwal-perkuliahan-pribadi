@@ -18,7 +18,7 @@ body {
   border-radius: 15px;
   box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.15);
   width: 100%;
-  max-width: 700px; /* Lebar maksimal kartu */
+  max-width: 700px; 
   text-align: center;
   margin: auto;
 }
@@ -57,13 +57,13 @@ body {
 
 /* Khusus Password Group (Agar tombol mata rapi) */
 .input-group {
-  margin-bottom: 20px; /* Margin bawah sama seperti input biasa */
+  margin-bottom: 20px; 
   display: flex;
-  align-items: stretch; /* Tinggi tombol samakan input */
+  align-items: stretch; 
 }
 
 .input-group .form-control {
-  margin-bottom: 0; /* Hapus margin bawah karena sudah di group */
+  margin-bottom: 0; 
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }

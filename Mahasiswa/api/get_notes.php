@@ -18,7 +18,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_
 
 require_once '../../koneksi.php';
 
-// PERUBAHAN: Tambahkan note_date ke SELECT dan urutkan berdasarkan tanggal
+//Tambahkan note_date ke SELECT dan urutkan berdasarkan tanggal
  $sql = "SELECT id, title, content, note_date, created_at, updated_at FROM notes WHERE user_id = ? ORDER BY note_date DESC, updated_at DESC";
 
 if ($stmt = $conn->prepare($sql)) {

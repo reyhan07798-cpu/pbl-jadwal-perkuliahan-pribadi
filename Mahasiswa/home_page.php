@@ -70,7 +70,7 @@
             opacity: 0.8;
         }
         
-        /* Underline effect untuk link biasa (opsional) */
+       
         .nav-links li a:not(.btn-login)::after {
             content: '';
             position: absolute;
@@ -85,14 +85,13 @@
             width: 100%;
         }
 
-        /* --- PERBAIKAN TOMBOL LOGIN --- */
         .btn-login {
             background-color: white;
             color: #1a4d80 !important;
-            padding: 0.6rem 2rem; /* Padding lebih lega */
-            border-radius: 50px; /* Sudut fully rounded (pill) */
+            padding: 0.6rem 2rem; 
+            border-radius: 50px; 
             font-weight: 700;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Bayangan agar timbul */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
             display: inline-block;
             border: 1px solid rgba(255,255,255,0.2);
             transition: all 0.3s ease;
@@ -100,16 +99,16 @@
 
         .btn-login:hover {
             background-color: #f8f9fa;
-            transform: translateY(-3px); /* Efek naik sedikit saat hover */
+            transform: translateY(-3px); 
             box-shadow: 0 6px 15px rgba(0,0,0,0.25);
             opacity: 1 !important;
         }
 
         .btn-login::after {
-            display: none; /* Hilangkan efek underline link biasa */
+            display: none; 
         }
 
-        /* Hamburger Menu (Mobile Toggle) */
+        /* Hamburger Menu  */
         .hamburger {
             display: none;
             cursor: pointer;
@@ -383,7 +382,6 @@
             
             /* Login Button di Mobile */
             .nav-links .btn-login {
-                /* Jangan full width, biarkan bentuk tombol tetap terlihat jelas */
                 width: auto; 
                 min-width: 180px; 
                 display: inline-block;
@@ -423,7 +421,6 @@
             <ul class="nav-links">
                 <li><a href="#">Beranda</a></li>
                 <li><a href="#kontak">Kontak Kami</a></li>
-                <!-- Tombol Login Diperbaiki: Hanya menggunakan tag <a> dengan class khusus -->
                 <li>
                     <a href="login_mahasiswa.php" class="btn-login">Login</a>
                 </li>

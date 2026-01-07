@@ -17,12 +17,12 @@ require_once '../../koneksi.php';
 
  $data = json_decode(file_get_contents("php://input"));
 
-// PERUBAHAN: Tambahkan validasi untuk note_date
+// Tambahkan validasi untuk note_date
 if (!empty($data->title) && !empty($data->content) && !empty($data->note_date)) {
-    // PERUBAHAN: Tambahkan note_date ke query
+    //Tambahkan note_date ke query
     $sql = "INSERT INTO notes (user_id, title, content, note_date) VALUES (?, ?, ?, ?)";
     if ($stmt = $conn->prepare($sql)) {
-        // PERUBAHAN: Tambahkan 's' untuk tipe string note_date
+        //Tambahkan 's' untuk tipe string note_date
         $stmt->bind_param("isss", $user_id, $data->title, $data->content, $data->note_date);
         if ($stmt->execute()) {
             http_response_code(201);
@@ -34,7 +34,7 @@ if (!empty($data->title) && !empty($data->content) && !empty($data->note_date)) 
         $stmt->close();
     }
 } else {
-    // PERUBAHAN: Perbarui pesan error
+    //Perbarui pesan error
     http_response_code(400);
     echo json_encode(array("message" => "Data tidak lengkap. Judul, konten, dan tanggal catatan diperlukan."));
 }

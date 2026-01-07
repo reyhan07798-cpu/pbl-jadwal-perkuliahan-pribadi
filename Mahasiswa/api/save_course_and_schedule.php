@@ -5,26 +5,25 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Memulai session
+
 session_start();
 
-// Cek apakah user sudah login
+// Cek user sudah login
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_SESSION["id"])) {
     http_response_code(401);
     echo json_encode(array("message" => "Akses ditolak. User tidak login atau session habis."));
     exit();
 }
 
-// Ambil user_id dari session
+//user_id dari session
  $user_id = $_SESSION["id"];
 
-// Sertakan file koneksi (PATH SUDAH DIPERBAIKI UNTUK STRUKTUR INI)
+// Sertakan file koneksi 
 require_once '../../koneksi.php';
 
-// Ambil data yang dikirim (dalam format JSON)
+// Ambil data yang dikirim 
  $data = json_decode(file_get_contents("php://input"));
 
-// Pastikan data yang diperlukan tidak kosong
 if (
     !empty($data->course_name) &&
     !empty($data->sks) &&

@@ -17,12 +17,12 @@ require_once '../../koneksi.php';
 
  $data = json_decode(file_get_contents("php://input"));
 
-// PERUBAHAN: Tambahkan validasi untuk note_date
+// Tambahkan validasi untuk note_date
 if (!empty($data->id) && !empty($data->title) && !empty($data->content) && !empty($data->note_date)) {
-    // PERUBAHAN: Tambahkan note_date ke query UPDATE
+    //Tambahkan note_date ke query UPDATE
     $sql = "UPDATE notes SET title = ?, content = ?, note_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?";
     if ($stmt = $conn->prepare($sql)) {
-        // PERUBAHAN: Tambahkan 's' untuk tipe string note_date dan sesuaikan urutan
+        //Tambahkan 's' untuk tipe string note_date dan sesuaikan urutan
         $stmt->bind_param("sssii", $data->title, $data->content, $data->note_date, $data->id, $user_id);
         if ($stmt->execute()) {
             if ($stmt->affected_rows > 0) {
@@ -39,7 +39,7 @@ if (!empty($data->id) && !empty($data->title) && !empty($data->content) && !empt
         $stmt->close();
     }
 } else {
-    // PERUBAHAN: Perbarui pesan error
+    //Perbarui pesan error
     http_response_code(400);
     echo json_encode(array("message" => "Data tidak lengkap. ID, judul, konten, dan tanggal catatan diperlukan."));
 }
