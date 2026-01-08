@@ -1,6 +1,4 @@
 <?php
-// --- VERSI FINAL: OTOMATIS MENYESUAIIKAN LOKASI VENDOR ---
-
 session_start();
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     http_response_code(401);
@@ -9,7 +7,6 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     exit();
 }
 
-// Script ini berada di /Mahasiswa/api/, jadi kita naik dua level untuk mencapai folder utama proyek
  $vendorPath = __DIR__ . '/../../vendor/autoload.php';
 
 if (!file_exists($vendorPath)) {

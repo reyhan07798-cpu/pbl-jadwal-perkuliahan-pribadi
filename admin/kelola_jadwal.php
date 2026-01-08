@@ -4,7 +4,6 @@ require_once 'fungsi.php';
 
  $page_title = 'Lihat Jadwal';
 
-// Query untuk menampilkan semua jadwal dengan info lengkap
  $stmt = $conn->prepare("
     SELECT 
         u.id as user_id, u.username,
@@ -17,8 +16,6 @@ require_once 'fungsi.php';
 ");
  $stmt->execute();
  $result = $stmt->get_result();
-
-// Kelompokkan hasil berdasarkan user_id
  $grouped_schedules = [];
 while ($row = $result->fetch_assoc()) {
     $user_id = $row['user_id'];
@@ -39,7 +36,6 @@ ob_start();
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex justify-content-between align-items-center">
         <h6 class="m-0 font-weight-bold text-primary">Daftar Jadwal per Pengguna</h6>
-        <!-- PERUBAHAN: Hapus tombol "Tambah Jadwal Baru" -->
     </div>
     <div class="card-body">
         <?php if (!empty($grouped_schedules)): ?>
@@ -61,7 +57,6 @@ ob_start();
                                             <th>Dosen</th>
                                             <th>Ruangan</th>
                                             <th>Waktu</th>
-                                            <!-- PERUBAHAN: Hapus kolom "Aksi" -->
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -75,7 +70,6 @@ ob_start();
                                                     <?php echo date('H:i', strtotime($schedule['start_time'])); ?> - 
                                                     <?php echo date('H:i', strtotime($schedule['end_time'])); ?>
                                                 </td>
-                                                <!-- PERUBAHAN: Hapus tombol Edit dan Hapus -->
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>

@@ -4,7 +4,7 @@ require_once "../koneksi.php";
 
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
     if ($_SESSION['role'] == 'admin') {
-        header("location: ../admin/beranda.php"); // PERBAIKAN: dasboard.php -> beranda.php
+        header("location: ../admin/beranda.php");
     } else {
         header("location: ../Mahasiswa/jadwal.php");
     }
@@ -124,7 +124,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     </div>
 
     <script>
-        // JavaScript untuk Toggle Show/Hide Password
         const togglePassword = document.querySelector('#togglePassword');
         const password = document.querySelector('#password');
         const toggleIcon = document.querySelector('#toggleIcon');

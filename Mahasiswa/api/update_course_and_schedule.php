@@ -1,5 +1,4 @@
 <?php
-// update_course_and_schedule.php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
@@ -16,23 +15,14 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_
 
 require_once '../../koneksi.php';
 
-// Ambil data dari JSON body
  $inputJSON = file_get_contents("php://input");
  $input = json_decode($inputJSON);
-
-// DEBUG: Cek apa yang diterima
-// file_put_contents('debug_update_log.txt', print_r($input, true), FILE_APPEND); 
 
 if (!empty($input)) {
     
     $conn->begin_transaction();
     try {
-        // 1. Update Tabel Courses
-        // Perbaikan: Pastikan query UPDATE menangkap kolom 'room'
         $stmt_course = $conn->prepare("UPDATE courses SET course_name = ?, sks = ?, dosen = ?, room = ? WHERE id = ? AND user_id = ?");
-        
-        // Binding: String, Int, String, String, Int, Int
-        // urutan: course_name, sks, dosen, room, id, user_id
         $stmt_course->bind_param("sisisi", 
             $input->course_name, 
             $input->sks, 
@@ -48,10 +38,7 @@ if (!empty($input)) {
             throw new Exception("Gagal update tabel courses: " . $stmt_course->error);
         }
 
-        // 2. Update Tabel Schedules
         $stmt_schedule = $conn->prepare("UPDATE schedules SET day_of_week = ?, start_time = ?, end_time = ? WHERE course_id = ? AND user_id = ?");
-        
-        // Binding: String, String, String, Int, Int
         $stmt_schedule->bind_param("sssii", 
             $input->day_of_week, 
             $input->start_time, 

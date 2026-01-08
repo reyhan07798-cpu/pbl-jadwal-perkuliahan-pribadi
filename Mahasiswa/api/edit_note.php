@@ -1,5 +1,4 @@
 <?php
-// edit_note.php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
@@ -17,7 +16,6 @@ require_once '../../koneksi.php';
 
  $data = json_decode(file_get_contents("php://input"));
 
-// Tambahkan validasi untuk note_date
 if (!empty($data->id) && !empty($data->title) && !empty($data->content) && !empty($data->note_date)) {
     $sql = "UPDATE notes SET title = ?, content = ?, note_date = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND user_id = ?";
     if ($stmt = $conn->prepare($sql)) {
@@ -37,7 +35,6 @@ if (!empty($data->id) && !empty($data->title) && !empty($data->content) && !empt
         $stmt->close();
     }
 } else {
-    //Perbarui pesan error
     http_response_code(400);
     echo json_encode(array("message" => "Data tidak lengkap. ID, judul, konten, dan tanggal catatan diperlukan."));
 }

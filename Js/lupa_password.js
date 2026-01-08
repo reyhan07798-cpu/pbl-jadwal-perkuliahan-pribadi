@@ -11,7 +11,6 @@ document.getElementById("lupaPasswordForm").addEventListener("submit", function 
 
     let valid = true;
 
-    // --- Validasi Input ---
     if (username === "") {
         usernameError.style.display = "block";
         valid = false;
@@ -39,27 +38,19 @@ document.getElementById("lupaPasswordForm").addEventListener("submit", function 
     }
 
     if (!valid) return;
-    // -----------------------
-
-    // --- Simulasi Perubahan Password menggunakan localStorage ---
     let akunTerdaftar = JSON.parse(localStorage.getItem("akun_mahasiswa"));
     
-    // 1. Cek apakah ada data akun di localStorage
     if (!akunTerdaftar) {
         alert("Tidak ada akun terdaftar! Silakan daftar terlebih dahulu.");
         return;
     }
 
-    // 2. Cocokkan Username dan Email
     if (akunTerdaftar.username === username && akunTerdaftar.email === email) {
-        // 3. Jika cocok, ganti password lama dengan password baru
         akunTerdaftar.password = newPassword;
         localStorage.setItem("akun_mahasiswa", JSON.stringify(akunTerdaftar));
         
         alert("Password berhasil diubah! Silakan login dengan password baru Anda.");
-        
-        // 4. Redirect ke halaman login
-        window.location.href = "login_mahasiswa.html"; 
+        window.location.href = "login_mahasiswa.php"; 
     } else {
         alert("Username atau Email tidak cocok dengan data akun!");
     }

@@ -12,15 +12,11 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
  $current_password_err = $new_password_err = $confirm_password_err = $success_msg = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // Validasi password lama
     if (empty(trim($_POST["current_password"]))) {
         $current_password_err = "Masukkan password lama Anda.";
     } else {
         $current_password = trim($_POST["current_password"]);
     }
-
-    // Validasi password baru
     if (empty(trim($_POST["new_password"]))) {
         $new_password_err = "Masukkan password baru.";
     } elseif (strlen(trim($_POST["new_password"])) < 6) {
@@ -29,7 +25,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $new_password = trim($_POST["new_password"]);
     }
 
-    // Validasi konfirmasi password baru
     if (empty(trim($_POST["confirm_password"]))) {
         $confirm_password_err = "Konfirmasi password baru.";
     } else {
@@ -39,10 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Jika tidak ada error, lanjutkan proses
     if (empty($current_password_err) && empty($new_password_err) && empty($confirm_password_err)) {
         
-        // Ambil password lama dari database
         $sql = "SELECT password FROM users WHERE id = ?";
         if ($stmt = $conn->prepare($sql)) {
             $stmt->bind_param("i", $param_id);
@@ -53,10 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt->bind_result($hashed_password);
                     if ($stmt->fetch()) {
                         
-                        // Verifikasi password lama yang dimasukkan user dengan password di database
                         if (password_verify($current_password, $hashed_password)) {
                             
-                            // Jika password lama benar, update password baru
                             $sql_update = "UPDATE users SET password = ? WHERE id = ?";
                             if ($stmt_update = $conn->prepare($sql_update)) {
                                 $stmt_update->bind_param("si", $param_new_password, $param_id);

@@ -32,7 +32,7 @@ ob_start();
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 50px;">No</th>
                         <th>Pembuat</th>
                         <th>Judul</th>
                         <th>Isi (Ringkasan)</th>
@@ -42,9 +42,10 @@ ob_start();
                 </thead>
                 <tbody>
                     <?php if ($notes->num_rows > 0): ?>
+                        <?php $no = 1; ?>
                         <?php while($note = $notes->fetch_assoc()): ?>
                         <tr>
-                            <td><?php echo $note['id']; ?></td>
+                            <td><?php echo $no++; ?></td>
                             <td><?php echo htmlspecialchars($note['username']); ?></td>
                             <td><?php echo htmlspecialchars($note['title']); ?></td>
                             <td><?php echo htmlspecialchars(substr($note['content'], 0, 50)) . '...'; ?></td>

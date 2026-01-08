@@ -1,8 +1,6 @@
 <?php
-// File: kirim_pesan.php
 header('Content-Type: application/json');
 
-// Koneksi ke database
 if (file_exists('../koneksi.php')) {
     require_once '../koneksi.php';
 } else {

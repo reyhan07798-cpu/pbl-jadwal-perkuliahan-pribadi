@@ -6,7 +6,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
-    // --- KONFIGURASI & STATE GLOBAL ---
     const API_BASE_URL = '../Mahasiswa/api/'; 
 
     const state = {
@@ -471,7 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
             showModal(`Edit Mata Kuliah: ${courseData.course_name}`, formHtml);
             
-            // Fix Duplicate Listener
             const form = document.getElementById('edit-course-form');
             const newForm = form.cloneNode(true);
             form.parentNode.replaceChild(newForm, form);
@@ -825,8 +823,6 @@ document.addEventListener('DOMContentLoaded', () => {
             hideLoading(elements.exportPdfBtn, originalText);
         }
     }
-
-    // --- START THE APP ---
     init();
 
 });

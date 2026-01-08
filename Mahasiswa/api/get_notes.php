@@ -1,5 +1,4 @@
 <?php
-// get_notes.php
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
@@ -18,7 +17,6 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || !isset($_
 
 require_once '../../koneksi.php';
 
-//Tambahkan note_date ke SELECT dan urutkan berdasarkan tanggal
  $sql = "SELECT id, title, content, note_date, created_at, updated_at FROM notes WHERE user_id = ? ORDER BY note_date DESC, updated_at DESC";
 
 if ($stmt = $conn->prepare($sql)) {

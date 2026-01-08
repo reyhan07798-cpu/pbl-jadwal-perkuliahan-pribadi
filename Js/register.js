@@ -13,37 +13,31 @@ document.addEventListener("DOMContentLoaded", function () {
     form.addEventListener("submit", function (event) {
         let valid = true;
 
-        // Reset error messages
         usernameError.style.display = "none";
         emailError.style.display = "none";
         passwordError.style.display = "none";
         confirmPasswordError.style.display = "none";
 
-        // Validasi Username
+        //VALIDASI
         if (username.value.trim() === "") {
             usernameError.style.display = "block";
             valid = false;
         }
-
-        // Validasi Email
         if (email.value.trim() === "") {
             emailError.style.display = "block";
             valid = false;
         }
 
-        // Validasi Password
         if (password.value.trim() === "") {
             passwordError.style.display = "block";
             valid = false;
         }
 
-        // Validasi Konfirmasi Password
         if (confirmPassword.value.trim() === "" || confirmPassword.value !== password.value) {
             confirmPasswordError.style.display = "block";
             valid = false;
         }
 
-        // Jika tidak valid, cegah form dari submit
         if (!valid) {
             event.preventDefault();
         }

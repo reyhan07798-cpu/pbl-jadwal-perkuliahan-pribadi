@@ -55,7 +55,6 @@ if (isset($_SESSION['toast'])) {
  $stmt_unread->execute();
  $total_unread = $stmt_unread->get_result()->fetch_row()[0];
 
-// Aktivitas User
  $recent_users = $conn->prepare("
     SELECT username, created_at 
     FROM users 
@@ -92,10 +91,7 @@ while ($row = $schedule_data->fetch_assoc()) {
 // ================= BUFFER KONTEN =================
 ob_start();
 ?>
-
-<!-- Konten Dashboard -->
 <div class="row">
-    <!-- Kartu Statistik -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-left-primary shadow h-100 py-2">
             <div class="card-body">
@@ -252,11 +248,9 @@ ob_start();
                                     <small class="text-muted"><?php echo date('d M Y, H:i', strtotime($message['created_at'])); ?></small>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <!-- Menampilkan Status Badge -->
                                     <span class="badge bg-<?php echo ($message['status'] ?? 'read') == 'unread' ? 'danger' : 'secondary'; ?> me-2">
                                         <?php echo ($message['status'] ?? 'read') == 'unread' ? 'Baru' : 'Dibaca'; ?>
                                     </span>
-                                    <!-- Tombol Tandai & Hapus (ID dipastikan ada) -->
                                     <a href="pesan_masuk.php?mark_read=<?php echo $message['id']; ?>" class="btn btn-sm btn-info me-1">Tandai</a>
                                     <a href="pesan_masuk.php?delete=<?php echo $message['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus pesan ini?')">Hapus</a>
                                 </div>

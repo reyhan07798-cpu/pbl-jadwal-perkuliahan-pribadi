@@ -31,10 +31,13 @@ if (isset($_GET['reset_id'])) {
 }
 
  $search = $_GET['search'] ?? '';
- $query = "SELECT id, username, email, created_at, role FROM users";
+ 
+ $query = "SELECT id, username, email, created_at, role FROM users WHERE role != 'admin'";
+
 if (!empty($search)) {
-    $query .= " WHERE username LIKE ? OR email LIKE ?";
+    $query .= " AND (username LIKE ? OR email LIKE ?)";
 }
+
  $query .= " ORDER BY created_at DESC";
 
  $stmt = $conn->prepare($query);
@@ -68,7 +71,7 @@ ob_start();
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>No</th>
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>

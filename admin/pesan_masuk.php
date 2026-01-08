@@ -1,22 +1,16 @@
 <?php
-// File: admin/pesan_masuk.php
-
-// 1. START SESSION (AMAN)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 2. KONEKSI DATABASE
 require_once '../koneksi.php';
 require_once 'fungsi.php'; 
 
-// 3. CEK LOGIN ADMIN
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header('Location: ../Mahasiswa/login_mahasiswa.php');
     exit;
 }
 
-// 4. NOTIFIKASI TOAST
  $toast_script = '';
 if (isset($_SESSION['toast'])) {
     $tipe  = $_SESSION['toast']['tipe'];
@@ -30,29 +24,23 @@ if (isset($_SESSION['toast'])) {
 
 // --- LOGIKA AKSI (Tandai Baca, Hapus, Tandai Semua) ---
 
-// Tandai 1 pesan sudah dibaca
 if (isset($_GET['action']) && $_GET['action'] === 'mark_read' && isset($_GET['id'])) {
     $stmt = $conn->prepare("UPDATE contact_messages SET status='read' WHERE id=?");
     $stmt->bind_param("i", $_GET['id']);
     $stmt->execute();
-    // Set Toast notifikasi
     $_SESSION['toast'] = ['tipe' => 'success', 'pesan' => 'Pesan ditandai sudah dibaca.'];
     header("Location: pesan_masuk.php"); 
     exit;
 }
 
-// Hapus 1 pesan
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $stmt = $conn->prepare("DELETE FROM contact_messages WHERE id=?");
     $stmt->bind_param("i", $_GET['id']);
     $stmt->execute();
-    // Set Toast notifikasi
     $_SESSION['toast'] = ['tipe' => 'success', 'pesan' => 'Pesan berhasil dihapus.'];
     header("Location: pesan_masuk.php"); 
     exit;
 }
-
-// Tandai semua sudah dibaca
 if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
     $conn->query("UPDATE contact_messages SET status='read'");
     $_SESSION['toast'] = ['tipe' => 'success', 'pesan' => 'Semua pesan ditandai sudah dibaca.'];
@@ -60,20 +48,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
     exit;
 }
 
-// --- AMBIL DATA ---
-
-// Ambil semua pesan
  $messages = $conn->query("SELECT * FROM contact_messages ORDER BY created_at DESC");
-
-// Ambil Statistik
  $total_msg = $messages->num_rows; 
-
-// Hitung unread
  $stmt_unread = $conn->prepare("SELECT COUNT(*) FROM contact_messages WHERE status='unread'");
  $stmt_unread->execute();
  $unread_count = $stmt_unread->get_result()->fetch_row()[0];
-
-// Hitung read
  $read_count = $total_msg - $unread_count;
 ?>
 <!DOCTYPE html>
@@ -82,14 +61,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($page_title); ?> - Admin Panel</title>
-    
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Chart.js (Opsional, disertakan agar konsisten) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
         
         
@@ -97,8 +71,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
             background-color: #f4f6f9;
             overflow-x: hidden; 
         }
-
-        /* 1. NAVBAR ATAS (KOTAK BIRU) */
         .navbar-custom {
             height: 60px; 
             background: linear-gradient(135deg, #1a4d80, #2c7be0);
@@ -107,16 +79,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
             position: fixed; 
             top: 0; left: 0; right: 0;
         }
-
-        /* 2. WRAPPER UTAMA (AGAR SIDEBAR & KONTEN RAPI) */
         .d-flex-wrapper {
             display: flex;
             width: 100%;
             margin-top: 60px; 
             min-height: calc(100vh - 60px);
         }
-
-        /* 3. SIDEBAR */
         .sidebar {
             background: white;
             width: 250px;
@@ -127,8 +95,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
             flex-direction: column;
             overflow-y: auto; 
         }
-
-        /* Styling Menu Sidebar */
         .nav-link {
             color: #333;
             padding: 12px 20px;
@@ -142,9 +108,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
             color: #0d6efd;
             padding-left: 25px; 
         }
-
-        /* 4. LOGIKA RESPONSIVE (HP vs LAPTOP) */
-
         /* --- MOBILE (HP) --- */
         @media (max-width: 767.98px) {
             .sidebar {
@@ -156,13 +119,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                 transform: translateX(-100%); 
                 box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             }
-
-            /* Ketika Sidebar Aktif (3 garis diklik di HP) */
             .sidebar.active {
                 transform: translateX(0); 
             }
-
-            /* Overlay Gelap saat menu buka di HP */
             #sidebarOverlay {
                 display: none;
                 position: fixed;
@@ -176,8 +135,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                 display: block;
                 opacity: 1;
             }
-            
-            /* Di HP, Sidebar sembunyi default */
             .sidebar { display: none; } 
             .sidebar.active { display: flex; }
         }
@@ -188,16 +145,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                 display: block !important; 
                 width: 250px;
             }
-
-            /* Logika Toggle di Desktop: Menyembunyikan (width 0) */
             .sidebar.collapsed {
                 width: 0;
                 min-width: 0;
                 overflow: hidden;
                 opacity: 0;
             }
-
-            /* Content melebar saat sidebar tutup */
             .main-content {
                 width: 100%;
                 transition: width 0.3s ease-in-out;
@@ -208,22 +161,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
     </style>
 </head>
 <body>
-
-    <!-- NAVBAR ATAS (Fixed) - SAMA PERSIS DENGAN DASHBOARD -->
     <nav class="navbar navbar-expand-lg navbar-dark navbar-custom px-3">
         <div class="container-fluid d-flex align-items-center">
-            
-            <!-- TOMBOL 3 GARIS (HAMBURGER) -->
             <button class="btn btn-outline-light btn-sm me-3 border-0" type="button" id="sidebarToggle">
                 <i class="bi bi-list fs-4"></i>
             </button>
-
-            <!-- BRAND / JUDUL -->
             <a class="navbar-brand fw-bold fs-5" href="#">
                 <i class="bi bi-grid-fill me-2"></i> Admin Panel
             </a>
-
-            <!-- TOMBOL LOGOUT & USERNAME (Kanan) -->
             <div class="ms-auto d-flex align-items-center gap-2">
                 <span class="text-white d-none d-md-block small">
                     <i class="bi bi-person-circle me-1"></i> 
@@ -235,14 +180,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
             </div>
         </div>
     </nav>
-
-    <!-- WRAPPER UTAMA -->
     <div class="d-flex-wrapper">
-        
-        <!-- OVERLAY (Khusus HP) -->
         <div id="sidebarOverlay"></div>
-
-        <!-- SIDEBAR - PESAN MASUK DI-AKTIFKAN -->
         <nav class="sidebar" id="sidebar">
             <div class="p-3 d-flex flex-column h-100">
                 <h5 class="text-primary fw-bold mb-4">Menu Utama</h5>
@@ -273,7 +212,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                             <i class="bi bi-sticky me-2"></i> Kelola Catatan
                         </a>
                     </li>
-                    <!-- MENU INI ACTIVE -->
                     <li class="nav-item mb-2">
                         <a class="nav-link active" href="pesan_masuk.php">
                             <i class="bi bi-envelope me-2"></i> Pesan Masuk
@@ -286,19 +224,14 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
             </div>
         </nav>
 
-        <!-- MAIN CONTENT (KONTEN) -->
         <div class="main-content p-4">
             <main>
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
                     <h1 class="h2"><?php echo htmlspecialchars($page_title); ?></h1>
-                    
-                    <!-- Tombol Tandai Semua -->
                     <a href="?action=mark_all_read" class="btn btn-sm btn-outline-primary" onclick="return confirm('Tandai semua pesan sudah dibaca?')">
                         <i class="bi bi-check-all"></i> Tandai Semua Dibaca
                     </a>
                 </div>
-
-                <!-- STATS (KARTU) -->
                 <div class="row mb-4">
                     <div class="col-md-4">
                         <div class="card text-white bg-primary mb-3 shadow-sm">
@@ -325,14 +258,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                         </div>
                     </div>
                 </div>
-
-                <!-- LIST PESAN -->
                 <div class="card shadow-sm">
                     <div class="card-body p-0">
                         <?php if ($messages->num_rows > 0): ?>
                             <div class="list-group list-group-flush">
                                 <?php while($msg = $messages->fetch_assoc()): ?>
-                                    <!-- Style Berbeda untuk Pesan Belum Dibaca -->
                                     <div class="list-group-item message-card <?php echo $msg['status'] == 'unread' ? 'unread' : 'read'; ?>">
                                         <div class="d-flex w-100 justify-content-between">
                                             <div class="me-3">
@@ -342,7 +272,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                                                 </div>
                                                 <small class="text-muted"><?php echo date('d M Y, H:i', strtotime($msg['created_at'])); ?></small>
                                             </div>
-                                            <!-- Badge Status -->
                                             <div class="text-end">
                                                 <span class="badge bg-<?php echo $msg['status'] == 'unread' ? 'danger' : 'secondary'; ?> mb-2 d-inline-block">
                                                     <?php echo $msg['status'] == 'unread' ? 'Baru' : 'Dibaca'; ?>
@@ -366,7 +295,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                                         </div>
                                     </div>
                                     <style>
-                                        /* Inline style tambahan untuk visualisasi pesan */
                                         .message-card.unread { background-color: #f0f7ff; border-left: 4px solid #0d6efd; }
                                         .message-card.read { background-color: #fff; border-left: 4px solid transparent; }
                                         .message-card:hover { background-color: #f8f9fa; }
@@ -396,8 +324,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
             <div class="toast-body" id="toast-body"></div>
         </div>
     </div>
-
-    <!-- JAVASCRIPT -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -405,24 +331,19 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
             const toggleBtn = document.getElementById('sidebarToggle');
             const overlay = document.getElementById('sidebarOverlay');
             const content = document.querySelector('.main-content');
-
-            // --- FUNGSI TOGGLE SIDEBAR (KLIK TOMBOL 3 TITIK) ---
             if (toggleBtn && sidebar) {
                 toggleBtn.addEventListener('click', function () {
                     const isMobile = window.innerWidth < 768;
 
                     if (isMobile) {
-                        // LOGIKA MOBILE: Tampilkan/Sembunyikan + Overlay
                         sidebar.classList.toggle('active');
                         overlay.classList.toggle('active');
                     } else {
-                        // LOGIKA LAPTOP: Tampilkan/Sembunyikan (Collapse)
                         sidebar.classList.toggle('collapsed');
                     }
                 });
             }
 
-            // --- FUNGSI TUTUP SAAT OVERLAY DIKLIK (KLIK LUAR SIDEBAR) ---
             if (overlay) {
                 overlay.addEventListener('click', function () {
                     sidebar.classList.remove('active');
@@ -430,15 +351,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'mark_all_read') {
                 });
             }
 
-            // --- FUNGSI RESET SAAT RESIZE WINDOW ---
             window.addEventListener('resize', function () {
                 if (window.innerWidth >= 768) {
-                    // Jika pindah ke Desktop, buka sidebar default, tutup overlay
                     sidebar.classList.remove('active');
                     overlay.classList.remove('active');
                     sidebar.classList.remove('collapsed'); 
                 } else {
-                    // Jika pindah ke Mobile, tutup sidebar & overlay
                     sidebar.classList.remove('active');
                     overlay.classList.remove('active');
                     sidebar.classList.remove('collapsed');

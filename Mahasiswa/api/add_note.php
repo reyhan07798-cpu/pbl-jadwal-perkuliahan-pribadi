@@ -1,5 +1,4 @@
 <?php
-// add_note.php
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
@@ -17,7 +16,6 @@ require_once '../../koneksi.php';
 
  $data = json_decode(file_get_contents("php://input"));
 
-// Tambahkan validasi untuk note_date
 if (!empty($data->title) && !empty($data->content) && !empty($data->note_date)) {
     $sql = "INSERT INTO notes (user_id, title, content, note_date) VALUES (?, ?, ?, ?)";
     if ($stmt = $conn->prepare($sql)) {
@@ -32,7 +30,6 @@ if (!empty($data->title) && !empty($data->content) && !empty($data->note_date)) 
         $stmt->close();
     }
 } else {
-    //Perbarui pesan error
     http_response_code(400);
     echo json_encode(array("message" => "Data tidak lengkap. Judul, konten, dan tanggal catatan diperlukan."));
 }
