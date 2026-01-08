@@ -1,14 +1,13 @@
 /**
- * @fileoverview Manages entire student schedule application UI and logic.
- * Handles course scheduling, calendar view, notes with dates, and data synchronization with a server.
- * @version 10.1 - Calendar: Hanya Nama MK (Tanpa Jam)
+ * @fileoverview 
+ * @version 10.1 
  */
 
 document.addEventListener('DOMContentLoaded', () => {
     'use strict';
 
     // --- KONFIGURASI & STATE GLOBAL ---
-    const API_BASE_URL = '../Mahasiswa/api/'; // Sesuaikan path folder API
+    const API_BASE_URL = '../Mahasiswa/api/'; 
 
     const state = {
         courses: [],
@@ -236,7 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const tbody = `<tr>${DAYS.map(day => `<td data-day="${day}"></td>`).join('')}</tr>`;
         elements.scheduleTable.innerHTML = thead + tbody;
 
-        // Isi Tabel
         state.schedules.forEach(item => {
             const dayCell = elements.scheduleTable.querySelector(`[data-day="${item.day_of_week}"]`);
             if (dayCell) {
@@ -262,7 +260,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         elements.calendarGrid.innerHTML = '';
         
-        // Render Header Hari (Minggu - Sabtu)
         Object.values(DAY_MAP).forEach(day => {
             const header = document.createElement('div');
             header.classList.add('calendar-day-header');
@@ -273,7 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstDayOfMonth = new Date(state.currentYear, state.currentMonth, 1).getDay();
         const daysInMonth = new Date(state.currentYear, state.currentMonth + 1, 0).getDate();
 
-        // Slot Kosong di awal bulan
         for (let i = 0; i < firstDayOfMonth; i++) {
             const emptyCell = document.createElement('div');
             emptyCell.classList.add('calendar-day', 'other-month');
@@ -282,32 +278,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Loop Tanggal
         for (let date = 1; date <= daysInMonth; date++) {
-            // Format Tanggal YYYY-MM-DD untuk pencatatan
             const dateStr = `${state.currentYear}-${String(state.currentMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
             
-            // Cek Nama Hari
             const dayName = DAY_MAP[new Date(state.currentYear, state.currentMonth, date).getDay()];
-            
-            // Cek Hari Ini
+
             const isToday = date === new Date().getDate() && 
                           state.currentMonth === new Date().getMonth() && 
                           state.currentYear === new Date().getFullYear();
 
-            //Elemen Kotak
             const dayCell = document.createElement('div');
             dayCell.classList.add('calendar-day');
             if (isToday) dayCell.classList.add('today');
             dayCell.dataset.date = dateStr;
             dayCell.dataset.dayName = dayName;
 
-            // Tambah Nomor Tanggal
             const dayNumber = document.createElement('div');
             dayNumber.classList.add('calendar-day-number');
             dayNumber.textContent = date;
             dayCell.appendChild(dayNumber);
 
-            // TAMBAHKAN EVENT (MK & NOTES) DISINI
-            // MK muncul di kalender TANPA JAM
             const eventsHtml = getCalendarEvents(dateStr, dayName);
             if (eventsHtml) {
                 dayCell.innerHTML += eventsHtml;
@@ -316,7 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.calendarGrid.appendChild(dayCell);
         }
 
-        // Update Judul
         elements.calendarMonthYear.textContent = `${MONTH_NAMES[state.currentMonth]} ${state.currentYear}`;
     }
 
@@ -324,18 +312,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function getCalendarEvents(dateStr, dayName) {
         let html = '';
 
-        // 1. Tambahkan Jadwal Mata Kuliah (HANYA NAMA MK)
         state.schedules.filter(s => s.day_of_week === dayName).forEach(item => {
             const course = state.courses.find(c => c.id === item.course_id);
             if (course) {
-                // PERBAIKAN: Tidak menampilkan jam, hanya nama mata kuliah
                 html += `<div class="calendar-event" data-course-id="${course.id}" title="${course.nama}">
                             ${course.nama}
                          </div>`;
             }
         });
 
-        // 2. Tambahkan Catatan
+        // Tambahkan Catatan
         state.notes.filter(note => note.note_date === dateStr).forEach(note => {
             html += `<div class="calendar-note" data-note-id="${note.id}" title="Catatan: ${note.title}">
                         ${note.title}
